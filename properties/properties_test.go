@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -11,6 +12,7 @@ type SimpleTest struct {
 	section  string
 	property string
 	value    string
+	env      string
 }
 
 type TestCase struct {
@@ -30,34 +32,55 @@ var (
 )
 var TestCases = []TestCase{
 	{"", pfile1, "", []SimpleTest{
-		{"core", "project", "cloudsdktest"},
-		{"core", "disable_usage_reporting", "True"},
+		{"core", "project", "cloudsdktest", ""},
+		{"core", "disable_usage_reporting", "True", ""},
 	}},
 	{"", pfile2, "", []SimpleTest{
-		{"core", "project", ""},
-		{"compute", "zone", "us-east"},
+		{"core", "project", "", ""},
+		{"compute", "zone", "us-east", ""},
+		{"compute", "zone", "foo", "CLOUDSDK_COMPUTE_ZONE=foo"},
 	}},
 	{pfile4, pfile1, "", []SimpleTest{
-		{"core", "account", "dgk@research.att.com"},
-		{"core", "disable_usage_reporting", "True"},
+		{"core", "account", "dgk@research.att.com", ""},
+		{"core", "disable_usage_reporting", "True", ""},
 	}},
 	{pfile1, pfile4, "", []SimpleTest{
-		{"core", "account", "potus@gmail.com"},
-		{"core", "disable_usage_reporting", "False"},
+		{"core", "account", "potus@gmail.com", ""},
+		{"core", "disable_usage_reporting", "False", ""},
 	}},
 	{pfile4, pfile1, pfile3, []SimpleTest{
-		{"compute", "zone", "us-central"},
-		{"core", "account", "dgk@research.att.com"},
+		{"compute", "zone", "us-central", ""},
+		{"core", "account", "dgk@research.att.com", ""},
+		{"core", "account", "joe@noip.me", "CLOUDSDK_CORE_ACCOUNT=joe@noip.me"},
 	}},
 	{"", pfile5, "", []SimpleTest{
-		{"core", "project", "cloudsdktest"},
-		{"core", "disable_usage_reporting", "True"},
+		{"core", "project", "cloudsdktest", ""},
+		{"core", "disable_usage_reporting", "True", ""},
 	}},
 	{"", pfile6, "", []SimpleTest{
-		{"core", "project", "cloudsdktest"},
-		{"core", "disable_usage_reporting", "True"},
+		{"core", "project", "cloudsdktest", ""},
+		{"core", "disable_usage_reporting", "True", ""},
+		{"core", "disable_usage_reporting", "False", "CLOUDSDK_CORE_DISABLE_USAGE_REPORTING=False"},
 	}},
 }
+
+func Unsetenv(name string) bool{
+	env := os.Environ()
+	for i,arg  := range env {
+		if strings.SplitN(arg, "=", 2)[0]  == name {
+			os.Clearenv()
+			for j, arg := range(env) {
+				if i!=j {
+					namval := strings.SplitN(arg,"=",2)
+					os.Setenv(namval[0], namval[1])
+				}
+			}
+			return true
+		}
+	}
+	return false
+}
+
 
 func SetupDirs(tmpdir string) ([3]string, error) {
 	var err error
@@ -104,6 +127,15 @@ func CreateOrRemove(path string, value string) error {
 }
 
 func runTest(p *Properties, t *testing.T, item SimpleTest, i, j int) *Properties {
+	if item.env != "" {
+		namval := strings.SplitN(item.env, "=", 2)
+		if namval[1] != "" {
+			if os.Setenv(namval[0], namval[1]) != nil {
+				return p
+			}
+			defer Unsetenv(namval[0])
+		}
+	}
 	err := p.LoadPropertiesFiles()
 	if err != nil {
 		t.Errorf("LoadProperties failed err=%s", err)

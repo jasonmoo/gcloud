@@ -9,6 +9,7 @@ import (
 	"os/user"
 	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 type Properties struct {
@@ -109,6 +110,18 @@ func (prop *Properties) ReadFrom(r io.Reader) error {
 	return err
 }
 
+func Getenv(name string) (string, bool) {
+        l := len(name)
+        for _,arg  := range os.Environ() {
+                i := strings.Index(arg,"=")
+                if l==i && strings.HasPrefix(arg, name) {
+                        return arg[i+1:] , true
+                }
+        }
+        return "", false
+}
+
+
 // return value of given property name from given section
 func (properties *Properties) Get(section string, propname string) (string, error) {
 	var prop *Property
@@ -120,7 +133,12 @@ func (properties *Properties) Get(section string, propname string) (string, erro
 	if !ok {
 		return "", fmt.Errorf("Unknown property in section %s", propname, section)
 	}
-	return prop.value, nil
+	envname := fmt.Sprintf("CLOUDSDK_%s_%s",strings.ToUpper(section), strings.ToUpper(propname))
+	value,ok := Getenv(envname)
+	if ! ok {
+		value = prop.value
+	}
+	return value, nil
 }
 
 func (properties *Properties) Set(section string, propname string, value string) error {
