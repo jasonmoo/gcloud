@@ -64,23 +64,23 @@ var TestCases = []TestCase{
 	}},
 }
 
-func Unsetenv(name string) bool{
+func Unsetenv(name string) bool {
 	env := os.Environ()
-	for i,arg  := range env {
-		if strings.SplitN(arg, "=", 2)[0]  == name {
-			os.Clearenv()
-			for j, arg := range(env) {
-				if i!=j {
-					namval := strings.SplitN(arg,"=",2)
-					os.Setenv(namval[0], namval[1])
-				}
-			}
-			return true
+	for i, arg := range env {
+		if strings.SplitN(arg, "=", 2)[0] != name {
+			continue
 		}
+		os.Clearenv()
+		for j, arg := range env {
+			if i != j {
+				namval := strings.SplitN(arg, "=", 2)
+				os.Setenv(namval[0], namval[1])
+			}
+		}
+		return true
 	}
 	return false
 }
-
 
 func SetupDirs(tmpdir string) ([3]string, error) {
 	var err error

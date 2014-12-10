@@ -111,16 +111,15 @@ func (prop *Properties) ReadFrom(r io.Reader) error {
 }
 
 func Getenv(name string) (string, bool) {
-        l := len(name)
-        for _,arg  := range os.Environ() {
-                i := strings.Index(arg,"=")
-                if l==i && strings.HasPrefix(arg, name) {
-                        return arg[i+1:] , true
-                }
-        }
-        return "", false
+	l := len(name)
+	for _, arg := range os.Environ() {
+		i := strings.Index(arg, "=")
+		if l == i && strings.HasPrefix(arg, name) {
+			return arg[i+1:], true
+		}
+	}
+	return "", false
 }
-
 
 // return value of given property name from given section
 func (properties *Properties) Get(section string, propname string) (string, error) {
@@ -133,9 +132,9 @@ func (properties *Properties) Get(section string, propname string) (string, erro
 	if !ok {
 		return "", fmt.Errorf("Unknown property in section %s", propname, section)
 	}
-	envname := fmt.Sprintf("CLOUDSDK_%s_%s",strings.ToUpper(section), strings.ToUpper(propname))
-	value,ok := Getenv(envname)
-	if ! ok {
+	envname := fmt.Sprintf("CLOUDSDK_%s_%s", strings.ToUpper(section), strings.ToUpper(propname))
+	value, ok := Getenv(envname)
+	if !ok {
 		value = prop.value
 	}
 	return value, nil
