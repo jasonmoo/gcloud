@@ -201,9 +201,9 @@ type DatabaseInstance struct {
 	// instance. The Google apps domain is prefixed if applicable.
 	Project string `json:"project,omitempty"`
 
-	// Region: The geographical region. Can be us-east1, us-central or
-	// europe-west1. Defaults to us-central. The region can not be changed
-	// after instance creation.
+	// Region: The geographical region. Can be us-central or europe-west1.
+	// Defaults to us-central. The region can not be changed after instance
+	// creation.
 	Region string `json:"region,omitempty"`
 
 	// Settings: The user settings.
@@ -581,6 +581,7 @@ func (c *BackupRunsGetCall) Do() (*BackupRun, error) {
 	//     "$ref": "BackupRun"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -711,6 +712,7 @@ func (c *BackupRunsListCall) Do() (*BackupRunsListResponse, error) {
 	//     "$ref": "BackupRunsListResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -797,6 +799,7 @@ func (c *InstancesDeleteCall) Do() (*InstancesDeleteResponse, error) {
 	//     "$ref": "InstancesDeleteResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -982,6 +985,7 @@ func (c *InstancesGetCall) Do() (*DatabaseInstance, error) {
 	//     "$ref": "DatabaseInstance"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1167,6 +1171,7 @@ func (c *InstancesInsertCall) Do() (*InstancesInsertResponse, error) {
 	//     "$ref": "InstancesInsertResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1276,6 +1281,7 @@ func (c *InstancesListCall) Do() (*InstancesListResponse, error) {
 	//     "$ref": "InstancesListResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1376,6 +1382,7 @@ func (c *InstancesPatchCall) Do() (*InstancesUpdateResponse, error) {
 	//     "$ref": "InstancesUpdateResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1462,6 +1469,7 @@ func (c *InstancesRestartCall) Do() (*InstancesRestartResponse, error) {
 	//     "$ref": "InstancesRestartResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1568,6 +1576,7 @@ func (c *InstancesRestoreBackupCall) Do() (*InstancesRestoreBackupResponse, erro
 	//     "$ref": "InstancesRestoreBackupResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1668,6 +1677,7 @@ func (c *InstancesUpdateCall) Do() (*InstancesUpdateResponse, error) {
 	//     "$ref": "InstancesUpdateResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1765,6 +1775,7 @@ func (c *OperationsGetCall) Do() (*InstanceOperation, error) {
 	//     "$ref": "InstanceOperation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1885,6 +1896,7 @@ func (c *OperationsListCall) Do() (*OperationsListResponse, error) {
 	//     "$ref": "OperationsListResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }
@@ -1947,6 +1959,7 @@ func (c *TiersListCall) Do() (*TiersListResponse, error) {
 	//     "$ref": "TiersListResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/sqlservice.admin"
 	//   ]
 	// }

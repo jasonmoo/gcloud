@@ -41,6 +41,9 @@ const basePath = "https://www.googleapis.com/compute/v1/projects/"
 
 // OAuth2 scopes used by this API.
 const (
+	// View and manage your data across Google Cloud Platform services
+	CloudPlatformScope = "https://www.googleapis.com/auth/cloud-platform"
+
 	// View and manage your Google Compute Engine resources
 	ComputeScope = "https://www.googleapis.com/auth/compute"
 
@@ -395,20 +398,22 @@ type ZonesService struct {
 }
 
 type AccessConfig struct {
-	// Kind: Type of the resource.
+	// Kind: [Output Only] Type of the resource. Always compute#accessConfig
+	// for access configs.
 	Kind string `json:"kind,omitempty"`
 
 	// Name: Name of this access configuration.
 	Name string `json:"name,omitempty"`
 
 	// NatIP: An external IP address associated with this instance. Specify
-	// an unused static IP address available to the project. If not
-	// specified, the external IP will be drawn from a shared ephemeral
-	// pool.
+	// an unused static external IP address available to the project or
+	// leave this field undefined to use an IP from a shared ephemeral IP
+	// address pool. If you specify a static external IP address, it must
+	// live in the same region as the zone of the instance.
 	NatIP string `json:"natIP,omitempty"`
 
-	// Type: Type of configuration. Must be set to "ONE_TO_ONE_NAT". This
-	// configures port-for-port NAT to the internet.
+	// Type: The type of configuration. The default and only option is
+	// ONE_TO_ONE_NAT.
 	Type string `json:"type,omitempty"`
 }
 
@@ -474,7 +479,7 @@ type AddressList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The address resources.
+	// Items: A list of Address resources.
 	Items []*Address `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -498,83 +503,131 @@ type AddressesScopedList struct {
 }
 
 type AddressesScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*AddressesScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type AddressesScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
 type AttachedDisk struct {
-	// AutoDelete: Whether the disk will be auto-deleted when the instance
-	// is deleted (but not when the disk is detached from the instance).
+	// AutoDelete: Specifies whether the disk will be auto-deleted when the
+	// instance is deleted (but not when the disk is detached from the
+	// instance).
 	AutoDelete bool `json:"autoDelete,omitempty"`
 
-	// Boot: Indicates that this is a boot disk. VM will use the first
-	// partition of the disk for its root filesystem.
+	// Boot: Indicates that this is a boot disk. The virtual machine will
+	// use the first partition of the disk for its root filesystem.
 	Boot bool `json:"boot,omitempty"`
 
-	// DeviceName: Persistent disk only; must be unique within the instance
-	// when specified. This represents a unique device name that is
+	// DeviceName: Specifies a unique device name of your choice that is
 	// reflected into the /dev/ tree of a Linux operating system running
-	// within the instance. If not specified, a default will be chosen by
-	// the system.
+	// within the instance. This name can be used to reference the device
+	// for mounting, resizing, and so on, from within the instance.
+	//
+	// If not
+	// specified, the server chooses a default device name to apply to this
+	// disk, in the form persistent-disks-x, where x is a number assigned by
+	// Google Compute Engine. This field is only applicable for persistent
+	// disks.
 	DeviceName string `json:"deviceName,omitempty"`
 
-	// Index: A zero-based index to assign to this disk, where 0 is reserved
-	// for the boot disk. If not specified, the server will choose an
-	// appropriate value (output only).
+	// Index: Assigns a zero-based index to this disk, where 0 is reserved
+	// for the boot disk. For example, if you have many disks attached to an
+	// instance, each disk would have a unique index number. If not
+	// specified, the server will choose an appropriate value.
 	Index int64 `json:"index,omitempty"`
 
-	// InitializeParams: Initialization parameters.
+	// InitializeParams: [Input Only] Specifies the parameters for a new
+	// disk that will be created alongside the new instance. Use
+	// initialization parameters to create boot disks or local SSDs attached
+	// to the new instance.
+	//
+	// This property is mutually exclusive with the
+	// source property; you can only define one or the other, but not both.
 	InitializeParams *AttachedDiskInitializeParams `json:"initializeParams,omitempty"`
 
 	Interface string `json:"interface,omitempty"`
 
-	// Kind: Type of the resource.
+	// Kind: [Output Only] Type of the resource. Always compute#attachedDisk
+	// for attached disks.
 	Kind string `json:"kind,omitempty"`
 
-	// Licenses: Public visible licenses.
+	// Licenses: [Output Only] Any valid publicly visible licenses.
 	Licenses []string `json:"licenses,omitempty"`
 
-	// Mode: The mode in which to attach this disk, either "READ_WRITE" or
-	// "READ_ONLY".
+	// Mode: The mode in which to attach this disk, either READ_WRITE or
+	// READ_ONLY. If not specified, the default is to attach the disk in
+	// READ_WRITE mode.
 	Mode string `json:"mode,omitempty"`
 
-	// Source: Persistent disk only; the URL of the persistent disk
-	// resource.
+	// Source: Specifies a valid partial or full URL to an existing
+	// Persistent Disk resource. This field is only applicable for
+	// persistent disks.
 	Source string `json:"source,omitempty"`
 
-	// Type: Type of the disk, either "SCRATCH" or "PERSISTENT". Note that
-	// persistent disks must be created before you can specify them here.
+	// Type: Specifies the type of the disk, either SCRATCH or PERSISTENT.
+	// If not specified, the default is PERSISTENT.
 	Type string `json:"type,omitempty"`
 }
 
 type AttachedDiskInitializeParams struct {
-	// DiskName: Name of the disk (when not provided defaults to the name of
-	// the instance).
+	// DiskName: Specifies the disk name. If not specified, the default is
+	// to use the name of the instance.
 	DiskName string `json:"diskName,omitempty"`
 
-	// DiskSizeGb: Size of the disk in base-2 GB.
+	// DiskSizeGb: Specifies the size of the disk in base-2 GB.
 	DiskSizeGb int64 `json:"diskSizeGb,omitempty,string"`
 
-	// DiskType: URL of the disk type resource describing which disk type to
-	// use to create the disk; provided by the client when the disk is
-	// created.
+	// DiskType: Specifies the disk type to use to create the instance. If
+	// not specified, the default is pd-standard, specified using the full
+	// URL. For
+	// example:
+	//
+	// https://www.googleapis.com/compute/v1/projects/project/zones
+	// /zone/diskTypes/pd-standard
+	//
+	// Other values include pd-ssd and
+	// local-ssd. If you define this field, you can provide either the full
+	// or partial URL. For example, the following are valid values:
+	// -
+	// https://www.googleapis.com/compute/v1/projects/project/zones/zone/disk
+	// Types/diskType
+	// - projects/project/zones/zone/diskTypes/diskType
+	// -
+	// zones/zone/diskTypes/diskType
 	DiskType string `json:"diskType,omitempty"`
 
-	// SourceImage: The source image used to create this disk.
+	// SourceImage: A source image used to create the disk. You can provide
+	// a private (custom) image, and Compute Engine will use the
+	// corresponding image from your project. For
+	// example:
+	//
+	// global/images/my-private-image
+	//
+	// Or you can provide an
+	// image from a publicly-available project. For example, to use a Debian
+	// image from the debian-cloud project, make sure to include the project
+	// in the
+	// URL:
+	//
+	// projects/debian-cloud/global/images/debian-7-wheezy-vYYYYMMDD
+	//
+	//
+	// where vYYYYMMDD is the image version. The fully-qualified URL will
+	// also work in both cases.
 	SourceImage string `json:"sourceImage,omitempty"`
 }
 
@@ -682,7 +735,7 @@ type BackendServiceList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The BackendService resources.
+	// Items: A list of BackendService resources.
 	Items []*BackendService `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -709,17 +762,17 @@ type DeprecationStatus struct {
 	// deprecation state of this resource will be changed to OBSOLETE.
 	Obsolete string `json:"obsolete,omitempty"`
 
-	// Replacement: A URL of the suggested replacement for the deprecated
-	// resource. The deprecated resource and its replacement must be
-	// resources of the same kind.
+	// Replacement: The URL of the suggested replacement for a deprecated
+	// resource. The suggested replacement resource must be the same kind of
+	// resource as the deprecated resource.
 	Replacement string `json:"replacement,omitempty"`
 
-	// State: The deprecation state. Can be "DEPRECATED", "OBSOLETE", or
-	// "DELETED". Operations which create a new resource using a
-	// "DEPRECATED" resource will return successfully, but with a warning
-	// indicating the deprecated resource and recommending its replacement.
-	// New uses of "OBSOLETE" or "DELETED" resources will result in an
-	// error.
+	// State: The deprecation state of this resource. This can be
+	// DEPRECATED, OBSOLETE, or DELETED. Operations which create a new
+	// resource using a DEPRECATED resource will return successfully, but
+	// with a warning indicating the deprecated resource and recommending
+	// its replacement. Operations which use OBSOLETE or DELETED resources
+	// will be rejected and result in an error.
 	State string `json:"state,omitempty"`
 }
 
@@ -810,7 +863,7 @@ type DiskList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The persistent disk resources.
+	// Items: A list of Disk resources.
 	Items []*Disk `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -884,7 +937,7 @@ type DiskTypeList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The disk type resources.
+	// Items: A list of DiskType resources.
 	Items []*DiskType `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -908,21 +961,22 @@ type DiskTypesScopedList struct {
 }
 
 type DiskTypesScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*DiskTypesScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type DiskTypesScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
@@ -936,21 +990,22 @@ type DisksScopedList struct {
 }
 
 type DisksScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*DisksScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type DisksScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
@@ -1028,7 +1083,7 @@ type FirewallList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The firewall resources.
+	// Items: A list of Firewall resources.
 	Items []*Firewall `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -1121,7 +1176,7 @@ type ForwardingRuleList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The ForwardingRule resources.
+	// Items: A list of ForwardingRule resources.
 	Items []*ForwardingRule `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -1145,21 +1200,22 @@ type ForwardingRulesScopedList struct {
 }
 
 type ForwardingRulesScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*ForwardingRulesScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type ForwardingRulesScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
@@ -1241,7 +1297,8 @@ type HttpHealthCheck struct {
 	SelfLink string `json:"selfLink,omitempty"`
 
 	// TimeoutSec: How long (in seconds) to wait before claiming failure.
-	// The default value is 5 seconds.
+	// The default value is 5 seconds. It is invalid for timeoutSec to have
+	// greater value than checkIntervalSec.
 	TimeoutSec int64 `json:"timeoutSec,omitempty"`
 
 	// UnhealthyThreshold: A so-far healthy VM will be marked unhealthy
@@ -1254,7 +1311,7 @@ type HttpHealthCheckList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The HttpHealthCheck resources.
+	// Items: A list of HttpHealthCheck resources.
 	Items []*HttpHealthCheck `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -1350,7 +1407,7 @@ type ImageList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The disk image resources.
+	// Items: A list of Image resources.
 	Items []*Image `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -1365,15 +1422,14 @@ type ImageList struct {
 }
 
 type Instance struct {
-	// CanIpForward: Allows this instance to send packets with source IP
-	// addresses other than its own and receive packets with destination IP
-	// addresses other than its own. If this instance will be used as an IP
-	// gateway or it will be set as the next-hop in a Route resource, say
-	// true. If unsure, leave this set to false.
+	// CanIpForward: Allows this instance to send and receive packets with
+	// non-matching destination or source IPs. This is required if you plan
+	// to use this instance to forward routes. For more information, see
+	// Enabling IP Forwarding.
 	CanIpForward bool `json:"canIpForward,omitempty"`
 
-	// CreationTimestamp: Creation timestamp in RFC3339 text format (output
-	// only).
+	// CreationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+	// format.
 	CreationTimestamp string `json:"creationTimestamp,omitempty"`
 
 	// Description: An optional textual description of the resource;
@@ -1384,101 +1440,111 @@ type Instance struct {
 	// must be created before you can assign them.
 	Disks []*AttachedDisk `json:"disks,omitempty"`
 
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
 	Id uint64 `json:"id,omitempty,string"`
 
-	// Kind: Type of the resource.
+	// Kind: [Output Only] Type of the resource. Always compute#instance for
+	// instances.
 	Kind string `json:"kind,omitempty"`
 
-	// MachineType: URL of the machine type resource describing which
-	// machine type to use to host the instance; provided by the client when
-	// the instance is created.
+	// MachineType: Full or partial URL of the machine type resource to use
+	// for this instance. This is provided by the client when the instance
+	// is created. For example, the following is a valid partial
+	// url:
+	//
+	// zones/zone/machineTypes/machine-type
 	MachineType string `json:"machineType,omitempty"`
 
-	// Metadata: Metadata key/value pairs assigned to this instance.
-	// Consists of custom metadata or predefined keys; see Instance
-	// documentation for more information.
+	// Metadata: The metadata key/value pairs assigned to this instance.
+	// This includes custom metadata and predefined keys.
 	Metadata *Metadata `json:"metadata,omitempty"`
 
 	// Name: Name of the resource; provided by the client when the resource
 	// is created. The name must be 1-63 characters long, and comply with
-	// RFC1035.
+	// RFC1035. Specifically, the name must be 1-63 characters long and
+	// match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means
+	// the first character must be a lowercase letter, and all following
+	// characters must be a dash, lowercase letter, or digit, except the
+	// last character, which cannot be a dash.
 	Name string `json:"name,omitempty"`
 
-	// NetworkInterfaces: Array of configurations for this interface. This
-	// specifies how this interface is configured to interact with other
-	// network services, such as connecting to the internet. Currently,
-	// ONE_TO_ONE_NAT is the only access config supported. If there are no
-	// accessConfigs specified, then this instance will have no external
-	// internet access.
+	// NetworkInterfaces: An array of configurations for this interface.
+	// This specifies how this interface is configured to interact with
+	// other network services, such as connecting to the internet.
 	NetworkInterfaces []*NetworkInterface `json:"networkInterfaces,omitempty"`
 
 	// Scheduling: Scheduling options for this instance.
 	Scheduling *Scheduling `json:"scheduling,omitempty"`
 
-	// SelfLink: Server defined URL for this resource (output only).
+	// SelfLink: [Output Only] Server defined URL for this resource.
 	SelfLink string `json:"selfLink,omitempty"`
 
-	// ServiceAccounts: A list of service accounts each with specified
-	// scopes, for which access tokens are to be made available to the
-	// instance through metadata queries.
+	// ServiceAccounts: A list of service accounts, with their specified
+	// scopes, authorized for this instance. Service accounts generate
+	// access tokens that can be accessed through the metadata server and
+	// used to authenticate applications on the instance. See Authenticating
+	// from Google Compute Engine for more information.
 	ServiceAccounts []*ServiceAccount `json:"serviceAccounts,omitempty"`
 
-	// Status: Instance status. One of the following values: "PROVISIONING",
-	// "STAGING", "RUNNING", "STOPPING", "STOPPED", "TERMINATED" (output
-	// only).
+	// Status: [Output Only] The status of the instance. One of the
+	// following values: PROVISIONING, STAGING, RUNNING, STOPPING, STOPPED,
+	// TERMINATED.
 	Status string `json:"status,omitempty"`
 
-	// StatusMessage: An optional, human-readable explanation of the status
-	// (output only).
+	// StatusMessage: [Output Only] An optional, human-readable explanation
+	// of the status.
 	StatusMessage string `json:"statusMessage,omitempty"`
 
-	// Tags: A list of tags to be applied to this instance. Used to identify
-	// valid sources or targets for network firewalls. Provided by the
-	// client on instance creation. The tags can be later modified by the
-	// setTags method. Each tag within the list must comply with RFC1035.
+	// Tags: A list of tags to appy to this instance. Tags are used to
+	// identify valid sources or targets for network firewalls and are
+	// specified by the client during instance creation. The tags can be
+	// later modified by the setTags method. Each tag within the list must
+	// comply with RFC1035.
 	Tags *Tags `json:"tags,omitempty"`
 
-	// Zone: URL of the zone where the instance resides (output only).
+	// Zone: [Output Only] URL of the zone where the instance resides.
 	Zone string `json:"zone,omitempty"`
 }
 
 type InstanceAggregatedList struct {
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
 	Id string `json:"id,omitempty"`
 
-	// Items: A map of scoped instance lists.
+	// Items: [Output Only] A map of scoped instance lists.
 	Items map[string]InstancesScopedList `json:"items,omitempty"`
 
-	// Kind: Type of resource.
+	// Kind: [Output Only] Type of resource. Always
+	// compute#instanceAggregatedList for aggregated lists of Instance
+	// resources.
 	Kind string `json:"kind,omitempty"`
 
-	// NextPageToken: A token used to continue a truncated list request
-	// (output only).
+	// NextPageToken: [Output Only] A token used to continue a truncated
+	// list request.
 	NextPageToken string `json:"nextPageToken,omitempty"`
 
-	// SelfLink: Server defined URL for this resource (output only).
+	// SelfLink: [Output Only] Server defined URL for this resource.
 	SelfLink string `json:"selfLink,omitempty"`
 }
 
 type InstanceList struct {
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
 	Id string `json:"id,omitempty"`
 
-	// Items: A list of instance resources.
+	// Items: [Output Only] A list of Instance resources.
 	Items []*Instance `json:"items,omitempty"`
 
-	// Kind: Type of resource.
+	// Kind: [Output Only] Type of resource. Always compute#instanceList for
+	// lists of Instance resources.
 	Kind string `json:"kind,omitempty"`
 
-	// NextPageToken: A token used to continue a truncated list request
-	// (output only).
+	// NextPageToken: [Output Only] A token used to continue a truncated
+	// list request.
 	NextPageToken string `json:"nextPageToken,omitempty"`
 
-	// SelfLink: Server defined URL for this resource (output only).
+	// SelfLink: [Output Only] Server defined URL for this resource.
 	SelfLink string `json:"selfLink,omitempty"`
 }
 
@@ -1574,7 +1640,7 @@ type InstanceTemplateList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: A list of instance template resources.
+	// Items: A list of InstanceTemplate resources.
 	Items []*InstanceTemplate `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -1589,30 +1655,31 @@ type InstanceTemplateList struct {
 }
 
 type InstancesScopedList struct {
-	// Instances: List of instances contained in this scope.
+	// Instances: [Output Only] List of instances contained in this scope.
 	Instances []*Instance `json:"instances,omitempty"`
 
-	// Warning: Informational warning which replaces the list of instances
-	// when the list is empty.
+	// Warning: [Output Only] Informational warning which replaces the list
+	// of instances when the list is empty.
 	Warning *InstancesScopedListWarning `json:"warning,omitempty"`
 }
 
 type InstancesScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*InstancesScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type InstancesScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
@@ -1634,8 +1701,8 @@ type License struct {
 }
 
 type MachineType struct {
-	// CreationTimestamp: Creation timestamp in RFC3339 text format (output
-	// only).
+	// CreationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+	// format.
 	CreationTimestamp string `json:"creationTimestamp,omitempty"`
 
 	// Deprecated: The deprecation status associated with this machine type.
@@ -1647,8 +1714,8 @@ type MachineType struct {
 	// GuestCpus: Count of CPUs exposed to the instance.
 	GuestCpus int64 `json:"guestCpus,omitempty"`
 
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
 	Id uint64 `json:"id,omitempty,string"`
 
 	// ImageSpaceGb: Space allotted for the image, defined in GB.
@@ -1674,10 +1741,11 @@ type MachineType struct {
 	// instance.
 	ScratchDisks []*MachineTypeScratchDisks `json:"scratchDisks,omitempty"`
 
-	// SelfLink: Server defined URL for the resource (output only).
+	// SelfLink: [Output Only] Server defined URL for the resource.
 	SelfLink string `json:"selfLink,omitempty"`
 
-	// Zone: Url of the zone where the machine type resides (output only).
+	// Zone: [Output Only] The name of the zone where the machine type
+	// resides, such as us-central1-a.
 	Zone string `json:"zone,omitempty"`
 }
 
@@ -1687,8 +1755,8 @@ type MachineTypeScratchDisks struct {
 }
 
 type MachineTypeAggregatedList struct {
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
 	Id string `json:"id,omitempty"`
 
 	// Items: A map of scoped machine type lists.
@@ -1697,8 +1765,8 @@ type MachineTypeAggregatedList struct {
 	// Kind: Type of resource.
 	Kind string `json:"kind,omitempty"`
 
-	// NextPageToken: A token used to continue a truncated list request
-	// (output only).
+	// NextPageToken: [Output Only] A token used to continue a truncated
+	// list request.
 	NextPageToken string `json:"nextPageToken,omitempty"`
 
 	// SelfLink: Server defined URL for this resource (output only).
@@ -1710,7 +1778,7 @@ type MachineTypeList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The machine type resources.
+	// Items: A list of MachineType resources.
 	Items []*MachineType `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -1728,41 +1796,46 @@ type MachineTypesScopedList struct {
 	// MachineTypes: List of machine types contained in this scope.
 	MachineTypes []*MachineType `json:"machineTypes,omitempty"`
 
-	// Warning: Informational warning which replaces the list of machine
-	// types when the list is empty.
+	// Warning: An informational warning that appears when the machine types
+	// list is empty.
 	Warning *MachineTypesScopedListWarning `json:"warning,omitempty"`
 }
 
 type MachineTypesScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*MachineTypesScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type MachineTypesScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
 type Metadata struct {
-	// Fingerprint: Fingerprint of this resource. A hash of the metadata's
-	// contents. This field is used for optimistic locking. An up-to-date
-	// metadata fingerprint must be provided in order to modify metadata.
+	// Fingerprint: Specifies a fingerprint for this request, which is
+	// essentially a hash of the metadata's contents and used for optimistic
+	// locking. The fingerprint is initially generated by Compute Engine and
+	// changes after every request to modify or update metadata. You must
+	// always provide an up-to-date fingerprint hash in order to update or
+	// change metadata.
 	Fingerprint string `json:"fingerprint,omitempty"`
 
 	// Items: Array of key/value pairs. The total size of all keys and
 	// values must be less than 512 KB.
 	Items []*MetadataItems `json:"items,omitempty"`
 
-	// Kind: Type of the resource.
+	// Kind: [Output Only] Type of the resource. Always compute#metadata for
+	// metadata.
 	Kind string `json:"kind,omitempty"`
 }
 
@@ -1819,23 +1892,36 @@ type Network struct {
 }
 
 type NetworkInterface struct {
-	// AccessConfigs: Array of configurations for this interface. This
-	// specifies how this interface is configured to interact with other
-	// network services, such as connecting to the internet. Currently,
-	// ONE_TO_ONE_NAT is the only access config supported. If there are no
-	// accessConfigs specified, then this instance will have no external
-	// internet access.
+	// AccessConfigs: An array of configurations for this interface.
+	// Currently, <codeONE_TO_ONE_NAT is the only access config supported.
+	// If there are no accessConfigs specified, then this instance will have
+	// no external internet access.
 	AccessConfigs []*AccessConfig `json:"accessConfigs,omitempty"`
 
-	// Name: Name of the network interface, determined by the server; for
-	// network devices, these are e.g. eth0, eth1, etc. (output only).
+	// Name: [Output Only] The name of the network interface, generated by
+	// the server. For network devices, these are eth0, eth1, etc.
 	Name string `json:"name,omitempty"`
 
-	// Network: URL of the network resource attached to this interface.
+	// Network: URL of the network resource for this instance. This is
+	// required for creating an instance but optional when creating a
+	// firewall rule. If not specified when creating a firewall rule, the
+	// default network is used:
+	//
+	// global/networks/default
+	//
+	// If you specify
+	// this property, you can specify the network as a full or partial URL.
+	// For example, the following are all valid URLs:
+	// -
+	// https://www.googleapis.com/compute/v1/projects/project/global/networks
+	// /network
+	// - projects/project/global/networks/network
+	// -
+	// global/networks/default
 	Network string `json:"network,omitempty"`
 
-	// NetworkIP: An optional IPV4 internal network address assigned to the
-	// instance for this network interface (output only).
+	// NetworkIP: [Output Only] An optional IPV4 internal network address
+	// assigned to the instance for this network interface.
 	NetworkIP string `json:"networkIP,omitempty"`
 }
 
@@ -1844,7 +1930,7 @@ type NetworkList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The network resources.
+	// Items: A list of Network resources.
 	Items []*Network `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -1859,194 +1945,199 @@ type NetworkList struct {
 }
 
 type Operation struct {
-	// ClientOperationId: An optional identifier specified by the client
-	// when the mutation was initiated. Must be unique for all operation
-	// resources in the project (output only).
+	// ClientOperationId: [Output Only] An optional identifier specified by
+	// the client when the mutation was initiated. Must be unique for all
+	// operation resources in the project
 	ClientOperationId string `json:"clientOperationId,omitempty"`
 
-	// CreationTimestamp: Creation timestamp in RFC3339 text format (output
-	// only).
+	// CreationTimestamp: [Output Only] Creation timestamp in RFC3339 text
+	// format.
 	CreationTimestamp string `json:"creationTimestamp,omitempty"`
 
-	// EndTime: The time that this operation was completed. This is in RFC
-	// 3339 format (output only).
+	// EndTime: [Output Only] The time that this operation was completed.
+	// This is in RFC3339 text format.
 	EndTime string `json:"endTime,omitempty"`
 
-	// Error: If errors occurred during processing of this operation, this
-	// field will be populated (output only).
+	// Error: [Output Only] If errors are generated during processing of the
+	// operation, this field will be populated.
 	Error *OperationError `json:"error,omitempty"`
 
-	// HttpErrorMessage: If operation fails, the HTTP error message
-	// returned, e.g. NOT FOUND. (output only).
+	// HttpErrorMessage: [Output Only] If the operation fails, this field
+	// contains the HTTP error message that was returned, such as NOT FOUND.
 	HttpErrorMessage string `json:"httpErrorMessage,omitempty"`
 
-	// HttpErrorStatusCode: If operation fails, the HTTP error status code
-	// returned, e.g. 404. (output only).
+	// HttpErrorStatusCode: [Output Only] If the operation fails, this field
+	// contains the HTTP error message that was returned, such as 404.
 	HttpErrorStatusCode int64 `json:"httpErrorStatusCode,omitempty"`
 
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
 	Id uint64 `json:"id,omitempty,string"`
 
-	// InsertTime: The time that this operation was requested. This is in
-	// RFC 3339 format (output only).
+	// InsertTime: [Output Only] The time that this operation was requested.
+	// This is in RFC3339 text format.
 	InsertTime string `json:"insertTime,omitempty"`
 
-	// Kind: Type of the resource.
+	// Kind: [Output Only] Type of the resource. Always compute#Operation
+	// for Operation resources.
 	Kind string `json:"kind,omitempty"`
 
-	// Name: Name of the resource (output only).
+	// Name: [Output Only] Name of the resource.
 	Name string `json:"name,omitempty"`
 
-	// OperationType: Type of the operation. Examples include "insert",
-	// "update", and "delete" (output only).
+	// OperationType: [Output Only] Type of the operation, such as insert,
+	// update, and delete.
 	OperationType string `json:"operationType,omitempty"`
 
-	// Progress: An optional progress indicator that ranges from 0 to 100.
-	// There is no requirement that this be linear or support any
-	// granularity of operations. This should not be used to guess at when
-	// the operation will be complete. This number should be monotonically
-	// increasing as the operation progresses (output only).
+	// Progress: [Output Only] An optional progress indicator that ranges
+	// from 0 to 100. There is no requirement that this be linear or support
+	// any granularity of operations. This should not be used to guess at
+	// when the operation will be complete. This number should be
+	// monotonically increasing as the operation progresses.
 	Progress int64 `json:"progress,omitempty"`
 
-	// Region: URL of the region where the operation resides (output only).
+	// Region: [Output Only] URL of the region where the operation resides.
+	// Only applicable for regional resources.
 	Region string `json:"region,omitempty"`
 
-	// SelfLink: Server defined URL for the resource (output only).
+	// SelfLink: [Output Only] Server defined URL for the resource.
 	SelfLink string `json:"selfLink,omitempty"`
 
-	// StartTime: The time that this operation was started by the server.
-	// This is in RFC 3339 format (output only).
+	// StartTime: [Output Only] The time that this operation was started by
+	// the server. This is in RFC3339 text format.
 	StartTime string `json:"startTime,omitempty"`
 
-	// Status: Status of the operation. Can be one of the following:
-	// "PENDING", "RUNNING", or "DONE" (output only).
+	// Status: [Output Only] Status of the operation. Can be one of the
+	// following: PENDING, RUNNING, or DONE.
 	Status string `json:"status,omitempty"`
 
-	// StatusMessage: An optional textual description of the current status
-	// of the operation (output only).
+	// StatusMessage: [Output Only] An optional textual description of the
+	// current status of the operation.
 	StatusMessage string `json:"statusMessage,omitempty"`
 
-	// TargetId: Unique target id which identifies a particular incarnation
-	// of the target (output only).
+	// TargetId: [Output Only] Unique target ID which identifies a
+	// particular incarnation of the target.
 	TargetId uint64 `json:"targetId,omitempty,string"`
 
-	// TargetLink: URL of the resource the operation is mutating (output
-	// only).
+	// TargetLink: [Output Only] URL of the resource the operation is
+	// mutating.
 	TargetLink string `json:"targetLink,omitempty"`
 
-	// User: User who requested the operation, for example
-	// "user@example.com" (output only).
+	// User: [Output Only] User who requested the operation, for example:
+	// user@example.com.
 	User string `json:"user,omitempty"`
 
-	// Warnings: If warning messages generated during processing of this
-	// operation, this field will be populated (output only).
+	// Warnings: [Output Only] If warning messages are generated during
+	// processing of the operation, this field will be populated.
 	Warnings []*OperationWarnings `json:"warnings,omitempty"`
 
-	// Zone: URL of the zone where the operation resides (output only).
+	// Zone: [Output Only] URL of the zone where the operation resides.
 	Zone string `json:"zone,omitempty"`
 }
 
 type OperationError struct {
-	// Errors: The array of errors encountered while processing this
-	// operation.
+	// Errors: [Output Only] The array of errors encountered while
+	// processing this operation.
 	Errors []*OperationErrorErrors `json:"errors,omitempty"`
 }
 
 type OperationErrorErrors struct {
-	// Code: The error type identifier for this error.
+	// Code: [Output Only] The error type identifier for this error.
 	Code string `json:"code,omitempty"`
 
-	// Location: Indicates the field in the request which caused the error.
-	// This property is optional.
+	// Location: [Output Only] Indicates the field in the request which
+	// caused the error. This property is optional.
 	Location string `json:"location,omitempty"`
 
-	// Message: An optional, human-readable error message.
+	// Message: [Output Only] An optional, human-readable error message.
 	Message string `json:"message,omitempty"`
 }
 
 type OperationWarnings struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*OperationWarningsData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type OperationWarningsData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
 type OperationAggregatedList struct {
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
 	Id string `json:"id,omitempty"`
 
-	// Items: A map of scoped operation lists.
+	// Items: [Output Only] A map of scoped operation lists.
 	Items map[string]OperationsScopedList `json:"items,omitempty"`
 
-	// Kind: Type of resource.
+	// Kind: [Output Only] Type of resource. Always
+	// compute#operationAggregatedList for aggregated lists of operations.
 	Kind string `json:"kind,omitempty"`
 
-	// NextPageToken: A token used to continue a truncated list request
-	// (output only).
+	// NextPageToken: [Output Only] A token used to continue a truncated
+	// list request.
 	NextPageToken string `json:"nextPageToken,omitempty"`
 
-	// SelfLink: Server defined URL for this resource (output only).
+	// SelfLink: [Output Only] Server defined URL for this resource.
 	SelfLink string `json:"selfLink,omitempty"`
 }
 
 type OperationList struct {
-	// Id: Unique identifier for the resource; defined by the server (output
-	// only).
+	// Id: [Output Only] Unique identifier for the resource; defined by the
+	// server.
 	Id string `json:"id,omitempty"`
 
-	// Items: The operation resources.
+	// Items: [Output Only] The operation resources.
 	Items []*Operation `json:"items,omitempty"`
 
-	// Kind: Type of resource.
+	// Kind: [Output Only] Type of resource. Always compute#operations for
+	// Operations resource.
 	Kind string `json:"kind,omitempty"`
 
-	// NextPageToken: A token used to continue a truncated list request
-	// (output only).
+	// NextPageToken: [Output Only] A token used to continue a truncate.
 	NextPageToken string `json:"nextPageToken,omitempty"`
 
-	// SelfLink: Server defined URL for this resource (output only).
+	// SelfLink: [Output Only] Server defined URL for this resource.
 	SelfLink string `json:"selfLink,omitempty"`
 }
 
 type OperationsScopedList struct {
-	// Operations: List of operations contained in this scope.
+	// Operations: [Output Only] List of operations contained in this scope.
 	Operations []*Operation `json:"operations,omitempty"`
 
-	// Warning: Informational warning which replaces the list of operations
-	// when the list is empty.
+	// Warning: [Output Only] Informational warning which replaces the list
+	// of operations when the list is empty.
 	Warning *OperationsScopedListWarning `json:"warning,omitempty"`
 }
 
 type OperationsScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*OperationsScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type OperationsScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
@@ -2111,13 +2202,13 @@ type Project struct {
 }
 
 type Quota struct {
-	// Limit: Quota limit for this metric.
+	// Limit: [Output Only] Quota limit for this metric.
 	Limit float64 `json:"limit,omitempty"`
 
-	// Metric: Name of the quota metric.
+	// Metric: [Output Only] Name of the quota metric.
 	Metric string `json:"metric,omitempty"`
 
-	// Usage: Current usage of this metric.
+	// Usage: [Output Only] Current usage of this metric.
 	Usage float64 `json:"usage,omitempty"`
 }
 
@@ -2161,7 +2252,7 @@ type RegionList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The region resources.
+	// Items: A list of Region resources.
 	Items []*Region `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -2241,21 +2332,22 @@ type Route struct {
 }
 
 type RouteWarnings struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*RouteWarningsData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type RouteWarningsData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
@@ -2264,7 +2356,7 @@ type RouteList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The route resources.
+	// Items: A list of Route resources.
 	Items []*Route `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -2279,25 +2371,26 @@ type RouteList struct {
 }
 
 type Scheduling struct {
-	// AutomaticRestart: Whether the Instance should be automatically
-	// restarted whenever it is terminated by Compute Engine (not terminated
-	// by user).
+	// AutomaticRestart: Specifies whether the instance should be
+	// automatically restarted if it is terminated by Compute Engine (not
+	// terminated by a user).
 	AutomaticRestart bool `json:"automaticRestart,omitempty"`
 
-	// OnHostMaintenance: How the instance should behave when the host
-	// machine undergoes maintenance that may temporarily impact instance
-	// performance.
+	// OnHostMaintenance: Defines the maintenance behavior for this
+	// instance. The default behavior is MIGRATE. For more information, see
+	// Setting maintenance behavior.
 	OnHostMaintenance string `json:"onHostMaintenance,omitempty"`
 }
 
 type SerialPortOutput struct {
-	// Contents: The contents of the console output.
+	// Contents: [Output Only] The contents of the console output.
 	Contents string `json:"contents,omitempty"`
 
-	// Kind: Type of the resource.
+	// Kind: [Output Only] Type of the resource. Always
+	// compute#serialPortOutput for serial port output.
 	Kind string `json:"kind,omitempty"`
 
-	// SelfLink: Server defined URL for the resource (output only).
+	// SelfLink: [Output Only] Server defined URL for the resource.
 	SelfLink string `json:"selfLink,omitempty"`
 }
 
@@ -2369,7 +2462,7 @@ type SnapshotList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The persistent snapshot resources.
+	// Items: A list of Snapshot resources.
 	Items []*Snapshot `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -2384,9 +2477,15 @@ type SnapshotList struct {
 }
 
 type Tags struct {
-	// Fingerprint: Fingerprint of this resource. A hash of the tags stored
-	// in this object. This field is used optimistic locking. An up-to-date
-	// tags fingerprint must be provided in order to modify tags.
+	// Fingerprint: Specifies a fingerprint for this request, which is
+	// essentially a hash of the metadata's contents and used for optimistic
+	// locking. The fingerprint is initially generated by Compute Engine and
+	// changes after every request to modify or update metadata. You must
+	// always provide an up-to-date fingerprint hash in order to update or
+	// change metadata.
+	//
+	// To see the latest fingerprint, make get() request
+	// to the instance.
 	Fingerprint string `json:"fingerprint,omitempty"`
 
 	// Items: An array of tags. Each tag must be 1-63 characters long, and
@@ -2428,7 +2527,7 @@ type TargetHttpProxyList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The TargetHttpProxy resources.
+	// Items: A list of TargetHttpProxy resources.
 	Items []*TargetHttpProxy `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -2503,7 +2602,7 @@ type TargetInstanceList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The TargetInstance resources.
+	// Items: A list of TargetInstance resources.
 	Items []*TargetInstance `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -2527,21 +2626,22 @@ type TargetInstancesScopedList struct {
 }
 
 type TargetInstancesScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*TargetInstancesScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type TargetInstancesScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
@@ -2661,7 +2761,7 @@ type TargetPoolList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The TargetPool resources.
+	// Items: A list of TargetPool resources.
 	Items []*TargetPool `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -2705,21 +2805,22 @@ type TargetPoolsScopedList struct {
 }
 
 type TargetPoolsScopedListWarning struct {
-	// Code: The warning type identifier for this warning.
+	// Code: [Output Only] The warning type identifier for this warning.
 	Code string `json:"code,omitempty"`
 
-	// Data: Metadata for this warning in 'key: value' format.
+	// Data: [Output Only] Metadata for this warning in key: value format.
 	Data []*TargetPoolsScopedListWarningData `json:"data,omitempty"`
 
-	// Message: Optional human-readable details for this warning.
+	// Message: [Output Only] Optional human-readable details for this
+	// warning.
 	Message string `json:"message,omitempty"`
 }
 
 type TargetPoolsScopedListWarningData struct {
-	// Key: A key for the warning data.
+	// Key: [Output Only] A key for the warning data.
 	Key string `json:"key,omitempty"`
 
-	// Value: A warning data value corresponding to the key.
+	// Value: [Output Only] A warning data value corresponding to the key.
 	Value string `json:"value,omitempty"`
 }
 
@@ -2787,7 +2888,7 @@ type UrlMapList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The UrlMap resources.
+	// Items: A list of UrlMap resources.
 	Items []*UrlMap `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -2915,7 +3016,7 @@ type ZoneList struct {
 	// only).
 	Id string `json:"id,omitempty"`
 
-	// Items: The zone resources.
+	// Items: A list of Zone resources.
 	Items []*Zone `json:"items,omitempty"`
 
 	// Kind: Type of resource.
@@ -3051,6 +3152,7 @@ func (c *AddressesAggregatedListCall) Do() (*AddressAggregatedList, error) {
 	//     "$ref": "AddressAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -3151,6 +3253,7 @@ func (c *AddressesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -3250,6 +3353,7 @@ func (c *AddressesGetCall) Do() (*Address, error) {
 	//     "$ref": "Address"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -3351,6 +3455,7 @@ func (c *AddressesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -3491,6 +3596,7 @@ func (c *AddressesListCall) Do() (*AddressList, error) {
 	//     "$ref": "AddressList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -3580,6 +3686,7 @@ func (c *BackendServicesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -3668,6 +3775,7 @@ func (c *BackendServicesGetCall) Do() (*BackendService, error) {
 	//     "$ref": "BackendService"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -3768,6 +3876,7 @@ func (c *BackendServicesGetHealthCall) Do() (*BackendServiceGroupHealth, error) 
 	//     "$ref": "BackendServiceGroupHealth"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -3858,6 +3967,7 @@ func (c *BackendServicesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -3987,6 +4097,7 @@ func (c *BackendServicesListCall) Do() (*BackendServiceList, error) {
 	//     "$ref": "BackendServiceList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -4088,6 +4199,7 @@ func (c *BackendServicesPatchCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -4187,6 +4299,7 @@ func (c *BackendServicesUpdateCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -4316,6 +4429,7 @@ func (c *DiskTypesAggregatedListCall) Do() (*DiskTypeAggregatedList, error) {
 	//     "$ref": "DiskTypeAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -4416,6 +4530,7 @@ func (c *DiskTypesGetCall) Do() (*DiskType, error) {
 	//     "$ref": "DiskType"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -4557,6 +4672,7 @@ func (c *DiskTypesListCall) Do() (*DiskTypeList, error) {
 	//     "$ref": "DiskTypeList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -4686,6 +4802,7 @@ func (c *DisksAggregatedListCall) Do() (*DiskAggregatedList, error) {
 	//     "$ref": "DiskAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -4796,6 +4913,7 @@ func (c *DisksCreateSnapshotCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -4895,6 +5013,7 @@ func (c *DisksDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -4994,6 +5113,7 @@ func (c *DisksGetCall) Do() (*Disk, error) {
 	//     "$ref": "Disk"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -5110,6 +5230,7 @@ func (c *DisksInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -5250,6 +5371,7 @@ func (c *DisksListCall) Do() (*DiskList, error) {
 	//     "$ref": "DiskList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -5339,6 +5461,7 @@ func (c *FirewallsDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -5427,6 +5550,7 @@ func (c *FirewallsGetCall) Do() (*Firewall, error) {
 	//     "$ref": "Firewall"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -5517,6 +5641,7 @@ func (c *FirewallsInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -5646,6 +5771,7 @@ func (c *FirewallsListCall) Do() (*FirewallList, error) {
 	//     "$ref": "FirewallList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -5747,6 +5873,7 @@ func (c *FirewallsPatchCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -5847,6 +5974,7 @@ func (c *FirewallsUpdateCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -5976,6 +6104,7 @@ func (c *ForwardingRulesAggregatedListCall) Do() (*ForwardingRuleAggregatedList,
 	//     "$ref": "ForwardingRuleAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -6076,6 +6205,7 @@ func (c *ForwardingRulesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -6175,6 +6305,7 @@ func (c *ForwardingRulesGetCall) Do() (*ForwardingRule, error) {
 	//     "$ref": "ForwardingRule"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -6276,6 +6407,7 @@ func (c *ForwardingRulesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -6416,6 +6548,7 @@ func (c *ForwardingRulesListCall) Do() (*ForwardingRuleList, error) {
 	//     "$ref": "ForwardingRuleList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -6527,6 +6660,7 @@ func (c *ForwardingRulesSetTargetCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -6615,6 +6749,7 @@ func (c *GlobalAddressesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -6703,6 +6838,7 @@ func (c *GlobalAddressesGetCall) Do() (*Address, error) {
 	//     "$ref": "Address"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -6793,6 +6929,7 @@ func (c *GlobalAddressesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -6921,6 +7058,7 @@ func (c *GlobalAddressesListCall) Do() (*AddressList, error) {
 	//     "$ref": "AddressList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -7010,6 +7148,7 @@ func (c *GlobalForwardingRulesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -7098,6 +7237,7 @@ func (c *GlobalForwardingRulesGetCall) Do() (*ForwardingRule, error) {
 	//     "$ref": "ForwardingRule"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -7188,6 +7328,7 @@ func (c *GlobalForwardingRulesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -7317,6 +7458,7 @@ func (c *GlobalForwardingRulesListCall) Do() (*ForwardingRuleList, error) {
 	//     "$ref": "ForwardingRuleList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -7417,6 +7559,7 @@ func (c *GlobalForwardingRulesSetTargetCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -7534,7 +7677,7 @@ func (c *GlobalOperationsAggregatedListCall) Do() (*OperationAggregatedList, err
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -7546,6 +7689,7 @@ func (c *GlobalOperationsAggregatedListCall) Do() (*OperationAggregatedList, err
 	//     "$ref": "OperationAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -7619,7 +7763,7 @@ func (c *GlobalOperationsDeleteCall) Do() error {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -7628,6 +7772,7 @@ func (c *GlobalOperationsDeleteCall) Do() error {
 	//   },
 	//   "path": "{project}/global/operations/{operation}",
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -7704,7 +7849,7 @@ func (c *GlobalOperationsGetCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -7716,6 +7861,7 @@ func (c *GlobalOperationsGetCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -7834,7 +7980,7 @@ func (c *GlobalOperationsListCall) Do() (*OperationList, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -7846,6 +7992,7 @@ func (c *GlobalOperationsListCall) Do() (*OperationList, error) {
 	//     "$ref": "OperationList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -7935,6 +8082,7 @@ func (c *HttpHealthChecksDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -8023,6 +8171,7 @@ func (c *HttpHealthChecksGetCall) Do() (*HttpHealthCheck, error) {
 	//     "$ref": "HttpHealthCheck"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -8113,6 +8262,7 @@ func (c *HttpHealthChecksInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -8242,6 +8392,7 @@ func (c *HttpHealthChecksListCall) Do() (*HttpHealthCheckList, error) {
 	//     "$ref": "HttpHealthCheckList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -8344,6 +8495,7 @@ func (c *HttpHealthChecksPatchCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -8444,6 +8596,7 @@ func (c *HttpHealthChecksUpdateCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -8532,6 +8685,7 @@ func (c *ImagesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -8632,6 +8786,7 @@ func (c *ImagesDeprecateCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -8720,6 +8875,7 @@ func (c *ImagesGetCall) Do() (*Image, error) {
 	//     "$ref": "Image"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -8810,6 +8966,7 @@ func (c *ImagesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/devstorage.full_control",
 	//     "https://www.googleapis.com/auth/devstorage.read_only",
@@ -8942,6 +9099,7 @@ func (c *ImagesListCall) Do() (*ImageList, error) {
 	//     "$ref": "ImageList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -9031,6 +9189,7 @@ func (c *InstanceTemplatesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -9119,6 +9278,7 @@ func (c *InstanceTemplatesGetCall) Do() (*InstanceTemplate, error) {
 	//     "$ref": "InstanceTemplate"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -9209,6 +9369,7 @@ func (c *InstanceTemplatesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -9338,6 +9499,7 @@ func (c *InstanceTemplatesListCall) Do() (*InstanceTemplateList, error) {
 	//     "$ref": "InstanceTemplateList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -9425,27 +9587,27 @@ func (c *InstancesAddAccessConfigCall) Do() (*Operation, error) {
 	//   ],
 	//   "parameters": {
 	//     "instance": {
-	//       "description": "Instance name.",
+	//       "description": "The instance name for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "networkInterface": {
-	//       "description": "Network interface name.",
+	//       "description": "The name of the network interface to add to this instance.",
 	//       "location": "query",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Project name.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -9460,6 +9622,7 @@ func (c *InstancesAddAccessConfigCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -9575,7 +9738,7 @@ func (c *InstancesAggregatedListCall) Do() (*InstanceAggregatedList, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -9587,6 +9750,7 @@ func (c *InstancesAggregatedListCall) Do() (*InstanceAggregatedList, error) {
 	//     "$ref": "InstanceAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -9605,7 +9769,7 @@ type InstancesAttachDiskCall struct {
 	opt_         map[string]interface{}
 }
 
-// AttachDisk: Attaches a disk resource to an instance.
+// AttachDisk: Attaches a Disk resource to an instance.
 func (r *InstancesService) AttachDisk(project string, zone string, instance string, attacheddisk *AttachedDisk) *InstancesAttachDiskCall {
 	c := &InstancesAttachDiskCall{s: r.s, opt_: make(map[string]interface{})}
 	c.project = project
@@ -9659,7 +9823,7 @@ func (c *InstancesAttachDiskCall) Do() (*Operation, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Attaches a disk resource to an instance.",
+	//   "description": "Attaches a Disk resource to an instance.",
 	//   "httpMethod": "POST",
 	//   "id": "compute.instances.attachDisk",
 	//   "parameterOrder": [
@@ -9676,14 +9840,14 @@ func (c *InstancesAttachDiskCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Project name.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -9698,6 +9862,7 @@ func (c *InstancesAttachDiskCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -9714,7 +9879,8 @@ type InstancesDeleteCall struct {
 	opt_     map[string]interface{}
 }
 
-// Delete: Deletes the specified instance resource.
+// Delete: Deletes the specified Instance resource. For more
+// information, see Shutting down an instance.
 func (r *InstancesService) Delete(project string, zone string, instance string) *InstancesDeleteCall {
 	c := &InstancesDeleteCall{s: r.s, opt_: make(map[string]interface{})}
 	c.project = project
@@ -9761,7 +9927,7 @@ func (c *InstancesDeleteCall) Do() (*Operation, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Deletes the specified instance resource.",
+	//   "description": "Deletes the specified Instance resource. For more information, see Shutting down an instance.",
 	//   "httpMethod": "DELETE",
 	//   "id": "compute.instances.delete",
 	//   "parameterOrder": [
@@ -9778,14 +9944,14 @@ func (c *InstancesDeleteCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -9797,6 +9963,7 @@ func (c *InstancesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -9879,33 +10046,33 @@ func (c *InstancesDeleteAccessConfigCall) Do() (*Operation, error) {
 	//   ],
 	//   "parameters": {
 	//     "accessConfig": {
-	//       "description": "Access config name.",
+	//       "description": "The name of the access config to delete.",
 	//       "location": "query",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "instance": {
-	//       "description": "Instance name.",
+	//       "description": "The instance name for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "networkInterface": {
-	//       "description": "Network interface name.",
+	//       "description": "The name of the network interface.",
 	//       "location": "query",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Project name.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -9917,6 +10084,7 @@ func (c *InstancesDeleteAccessConfigCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -10008,14 +10176,14 @@ func (c *InstancesDetachDiskCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Project name.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10027,6 +10195,7 @@ func (c *InstancesDetachDiskCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -10107,14 +10276,14 @@ func (c *InstancesGetCall) Do() (*Instance, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the The name of the zone for this request..",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10126,6 +10295,7 @@ func (c *InstancesGetCall) Do() (*Instance, error) {
 	//     "$ref": "Instance"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -10208,14 +10378,14 @@ func (c *InstancesGetSerialPortOutputCall) Do() (*SerialPortOutput, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10227,6 +10397,7 @@ func (c *InstancesGetSerialPortOutputCall) Do() (*SerialPortOutput, error) {
 	//     "$ref": "SerialPortOutput"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -10306,14 +10477,14 @@ func (c *InstancesInsertCall) Do() (*Operation, error) {
 	//   ],
 	//   "parameters": {
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10328,6 +10499,7 @@ func (c *InstancesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -10449,14 +10621,14 @@ func (c *InstancesListCall) Do() (*InstanceList, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10468,6 +10640,7 @@ func (c *InstancesListCall) Do() (*InstanceList, error) {
 	//     "$ref": "InstanceList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -10549,14 +10722,14 @@ func (c *InstancesResetCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10568,6 +10741,7 @@ func (c *InstancesResetCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -10587,7 +10761,7 @@ type InstancesSetDiskAutoDeleteCall struct {
 }
 
 // SetDiskAutoDelete: Sets the auto-delete flag for a disk attached to
-// an instance
+// an instance.
 func (r *InstancesService) SetDiskAutoDelete(project string, zone string, instance string, autoDelete bool, deviceName string) *InstancesSetDiskAutoDeleteCall {
 	c := &InstancesSetDiskAutoDeleteCall{s: r.s, opt_: make(map[string]interface{})}
 	c.project = project
@@ -10638,7 +10812,7 @@ func (c *InstancesSetDiskAutoDeleteCall) Do() (*Operation, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Sets the auto-delete flag for a disk attached to an instance",
+	//   "description": "Sets the auto-delete flag for a disk attached to an instance.",
 	//   "httpMethod": "POST",
 	//   "id": "compute.instances.setDiskAutoDelete",
 	//   "parameterOrder": [
@@ -10656,28 +10830,28 @@ func (c *InstancesSetDiskAutoDeleteCall) Do() (*Operation, error) {
 	//       "type": "boolean"
 	//     },
 	//     "deviceName": {
-	//       "description": "Disk device name to modify.",
+	//       "description": "The device name of the disk to modify.",
 	//       "location": "query",
 	//       "pattern": "\\w[\\w.-]{0,254}",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "instance": {
-	//       "description": "Instance name.",
+	//       "description": "The instance name.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Project name.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10689,6 +10863,7 @@ func (c *InstancesSetDiskAutoDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -10778,14 +10953,14 @@ func (c *InstancesSetMetadataCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10800,6 +10975,7 @@ func (c *InstancesSetMetadataCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -10888,14 +11064,14 @@ func (c *InstancesSetSchedulingCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Project name.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -10910,6 +11086,7 @@ func (c *InstancesSetSchedulingCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -10999,14 +11176,14 @@ func (c *InstancesSetTagsCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
 	//       "type": "string"
 	//     },
 	//     "zone": {
-	//       "description": "Name of the zone scoping this request.",
+	//       "description": "The name of the zone for this request.",
 	//       "location": "path",
 	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
 	//       "required": true,
@@ -11021,6 +11198,215 @@ func (c *InstancesSetTagsCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute"
+	//   ]
+	// }
+
+}
+
+// method id "compute.instances.start":
+
+type InstancesStartCall struct {
+	s        *Service
+	project  string
+	zone     string
+	instance string
+	opt_     map[string]interface{}
+}
+
+// Start: This method starts an instance that was stopped using the
+// using the instances().stop method. For more information, see Restart
+// an instance.
+func (r *InstancesService) Start(project string, zone string, instance string) *InstancesStartCall {
+	c := &InstancesStartCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.zone = zone
+	c.instance = instance
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *InstancesStartCall) Fields(s ...googleapi.Field) *InstancesStartCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *InstancesStartCall) Do() (*Operation, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/zones/{zone}/instances/{instance}/start")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project":  c.project,
+		"zone":     c.zone,
+		"instance": c.instance,
+	})
+	req.Header.Set("User-Agent", "google-api-go-client/0.5")
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *Operation
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "This method starts an instance that was stopped using the using the instances().stop method. For more information, see Restart an instance.",
+	//   "httpMethod": "POST",
+	//   "id": "compute.instances.start",
+	//   "parameterOrder": [
+	//     "project",
+	//     "zone",
+	//     "instance"
+	//   ],
+	//   "parameters": {
+	//     "instance": {
+	//       "description": "Name of the instance resource to start.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "zone": {
+	//       "description": "The name of the zone for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/zones/{zone}/instances/{instance}/start",
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
+	//     "https://www.googleapis.com/auth/compute"
+	//   ]
+	// }
+
+}
+
+// method id "compute.instances.stop":
+
+type InstancesStopCall struct {
+	s        *Service
+	project  string
+	zone     string
+	instance string
+	opt_     map[string]interface{}
+}
+
+// Stop: This method stops a running instance, shutting it down cleanly,
+// and allows you to restart the instance at a later time. Stopped
+// instances do not incur per-minute, virtual machine usage charges
+// while they are stopped, but any resources that the virtual machine is
+// using, such as persistent disks and static IP addresses,will continue
+// to be charged until they are deleted. For more information, see
+// Stopping an instance.
+func (r *InstancesService) Stop(project string, zone string, instance string) *InstancesStopCall {
+	c := &InstancesStopCall{s: r.s, opt_: make(map[string]interface{})}
+	c.project = project
+	c.zone = zone
+	c.instance = instance
+	return c
+}
+
+// Fields allows partial responses to be retrieved.
+// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
+// for more information.
+func (c *InstancesStopCall) Fields(s ...googleapi.Field) *InstancesStopCall {
+	c.opt_["fields"] = googleapi.CombineFields(s)
+	return c
+}
+
+func (c *InstancesStopCall) Do() (*Operation, error) {
+	var body io.Reader = nil
+	params := make(url.Values)
+	params.Set("alt", "json")
+	if v, ok := c.opt_["fields"]; ok {
+		params.Set("fields", fmt.Sprintf("%v", v))
+	}
+	urls := googleapi.ResolveRelative(c.s.BasePath, "{project}/zones/{zone}/instances/{instance}/stop")
+	urls += "?" + params.Encode()
+	req, _ := http.NewRequest("POST", urls, body)
+	googleapi.Expand(req.URL, map[string]string{
+		"project":  c.project,
+		"zone":     c.zone,
+		"instance": c.instance,
+	})
+	req.Header.Set("User-Agent", "google-api-go-client/0.5")
+	res, err := c.s.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer googleapi.CloseBody(res)
+	if err := googleapi.CheckResponse(res); err != nil {
+		return nil, err
+	}
+	var ret *Operation
+	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
+		return nil, err
+	}
+	return ret, nil
+	// {
+	//   "description": "This method stops a running instance, shutting it down cleanly, and allows you to restart the instance at a later time. Stopped instances do not incur per-minute, virtual machine usage charges while they are stopped, but any resources that the virtual machine is using, such as persistent disks and static IP addresses,will continue to be charged until they are deleted. For more information, see Stopping an instance.",
+	//   "httpMethod": "POST",
+	//   "id": "compute.instances.stop",
+	//   "parameterOrder": [
+	//     "project",
+	//     "zone",
+	//     "instance"
+	//   ],
+	//   "parameters": {
+	//     "instance": {
+	//       "description": "Name of the instance resource to start.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "project": {
+	//       "description": "Project ID for this request.",
+	//       "location": "path",
+	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+	//       "required": true,
+	//       "type": "string"
+	//     },
+	//     "zone": {
+	//       "description": "The name of the zone for this request.",
+	//       "location": "path",
+	//       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+	//       "required": true,
+	//       "type": "string"
+	//     }
+	//   },
+	//   "path": "{project}/zones/{zone}/instances/{instance}/stop",
+	//   "response": {
+	//     "$ref": "Operation"
+	//   },
+	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -11109,6 +11495,7 @@ func (c *LicensesGetCall) Do() (*License, error) {
 	//     "$ref": "License"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -11227,7 +11614,7 @@ func (c *MachineTypesAggregatedListCall) Do() (*MachineTypeAggregatedList, error
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -11239,6 +11626,7 @@ func (c *MachineTypesAggregatedListCall) Do() (*MachineTypeAggregatedList, error
 	//     "$ref": "MachineTypeAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -11320,7 +11708,7 @@ func (c *MachineTypesGetCall) Do() (*MachineType, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -11339,6 +11727,7 @@ func (c *MachineTypesGetCall) Do() (*MachineType, error) {
 	//     "$ref": "MachineType"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -11461,7 +11850,7 @@ func (c *MachineTypesListCall) Do() (*MachineTypeList, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -11480,6 +11869,7 @@ func (c *MachineTypesListCall) Do() (*MachineTypeList, error) {
 	//     "$ref": "MachineTypeList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -11569,6 +11959,7 @@ func (c *NetworksDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -11657,6 +12048,7 @@ func (c *NetworksGetCall) Do() (*Network, error) {
 	//     "$ref": "Network"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -11747,6 +12139,7 @@ func (c *NetworksInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -11876,6 +12269,7 @@ func (c *NetworksListCall) Do() (*NetworkList, error) {
 	//     "$ref": "NetworkList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -11954,6 +12348,7 @@ func (c *ProjectsGetCall) Do() (*Project, error) {
 	//     "$ref": "Project"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -12044,6 +12439,7 @@ func (c *ProjectsSetCommonInstanceMetadataCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -12132,6 +12528,7 @@ func (c *ProjectsSetUsageExportBucketCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/devstorage.full_control",
 	//     "https://www.googleapis.com/auth/devstorage.read_only",
@@ -12211,7 +12608,7 @@ func (c *RegionOperationsDeleteCall) Do() error {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -12227,6 +12624,7 @@ func (c *RegionOperationsDeleteCall) Do() error {
 	//   },
 	//   "path": "{project}/regions/{region}/operations/{operation}",
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -12307,7 +12705,7 @@ func (c *RegionOperationsGetCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -12326,6 +12724,7 @@ func (c *RegionOperationsGetCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -12448,7 +12847,7 @@ func (c *RegionOperationsListCall) Do() (*OperationList, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -12467,6 +12866,7 @@ func (c *RegionOperationsListCall) Do() (*OperationList, error) {
 	//     "$ref": "OperationList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -12556,6 +12956,7 @@ func (c *RegionsGetCall) Do() (*Region, error) {
 	//     "$ref": "Region"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -12686,6 +13087,7 @@ func (c *RegionsListCall) Do() (*RegionList, error) {
 	//     "$ref": "RegionList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -12775,6 +13177,7 @@ func (c *RoutesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -12863,6 +13266,7 @@ func (c *RoutesGetCall) Do() (*Route, error) {
 	//     "$ref": "Route"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -12953,6 +13357,7 @@ func (c *RoutesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -13082,6 +13487,7 @@ func (c *RoutesListCall) Do() (*RouteList, error) {
 	//     "$ref": "RouteList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -13171,6 +13577,7 @@ func (c *SnapshotsDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -13259,6 +13666,7 @@ func (c *SnapshotsGetCall) Do() (*Snapshot, error) {
 	//     "$ref": "Snapshot"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -13389,6 +13797,7 @@ func (c *SnapshotsListCall) Do() (*SnapshotList, error) {
 	//     "$ref": "SnapshotList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -13478,6 +13887,7 @@ func (c *TargetHttpProxiesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -13566,6 +13976,7 @@ func (c *TargetHttpProxiesGetCall) Do() (*TargetHttpProxy, error) {
 	//     "$ref": "TargetHttpProxy"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -13656,6 +14067,7 @@ func (c *TargetHttpProxiesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -13785,6 +14197,7 @@ func (c *TargetHttpProxiesListCall) Do() (*TargetHttpProxyList, error) {
 	//     "$ref": "TargetHttpProxyList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -13885,6 +14298,7 @@ func (c *TargetHttpProxiesSetUrlMapCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -14014,6 +14428,7 @@ func (c *TargetInstancesAggregatedListCall) Do() (*TargetInstanceAggregatedList,
 	//     "$ref": "TargetInstanceAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -14114,6 +14529,7 @@ func (c *TargetInstancesDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -14213,6 +14629,7 @@ func (c *TargetInstancesGetCall) Do() (*TargetInstance, error) {
 	//     "$ref": "TargetInstance"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -14314,6 +14731,7 @@ func (c *TargetInstancesInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -14454,6 +14872,7 @@ func (c *TargetInstancesListCall) Do() (*TargetInstanceList, error) {
 	//     "$ref": "TargetInstanceList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -14564,6 +14983,7 @@ func (c *TargetPoolsAddHealthCheckCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -14673,6 +15093,7 @@ func (c *TargetPoolsAddInstanceCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -14801,6 +15222,7 @@ func (c *TargetPoolsAggregatedListCall) Do() (*TargetPoolAggregatedList, error) 
 	//     "$ref": "TargetPoolAggregatedList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -14901,6 +15323,7 @@ func (c *TargetPoolsDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -15000,6 +15423,7 @@ func (c *TargetPoolsGetCall) Do() (*TargetPool, error) {
 	//     "$ref": "TargetPool"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -15111,6 +15535,7 @@ func (c *TargetPoolsGetHealthCall) Do() (*TargetPoolInstanceHealth, error) {
 	//     "$ref": "TargetPoolInstanceHealth"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -15212,6 +15637,7 @@ func (c *TargetPoolsInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -15352,6 +15778,7 @@ func (c *TargetPoolsListCall) Do() (*TargetPoolList, error) {
 	//     "$ref": "TargetPoolList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -15462,6 +15889,7 @@ func (c *TargetPoolsRemoveHealthCheckCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -15571,6 +15999,7 @@ func (c *TargetPoolsRemoveInstanceCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -15697,6 +16126,7 @@ func (c *TargetPoolsSetBackupCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -15785,6 +16215,7 @@ func (c *UrlMapsDeleteCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -15873,6 +16304,7 @@ func (c *UrlMapsGetCall) Do() (*UrlMap, error) {
 	//     "$ref": "UrlMap"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -15963,6 +16395,7 @@ func (c *UrlMapsInsertCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -16092,6 +16525,7 @@ func (c *UrlMapsListCall) Do() (*UrlMapList, error) {
 	//     "$ref": "UrlMapList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -16193,6 +16627,7 @@ func (c *UrlMapsPatchCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -16292,6 +16727,7 @@ func (c *UrlMapsUpdateCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -16393,6 +16829,7 @@ func (c *UrlMapsValidateCall) Do() (*UrlMapsValidateResponse, error) {
 	//     "$ref": "UrlMapsValidateResponse"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -16469,7 +16906,7 @@ func (c *ZoneOperationsDeleteCall) Do() error {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -16485,6 +16922,7 @@ func (c *ZoneOperationsDeleteCall) Do() error {
 	//   },
 	//   "path": "{project}/zones/{zone}/operations/{operation}",
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute"
 	//   ]
 	// }
@@ -16565,7 +17003,7 @@ func (c *ZoneOperationsGetCall) Do() (*Operation, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -16584,6 +17022,7 @@ func (c *ZoneOperationsGetCall) Do() (*Operation, error) {
 	//     "$ref": "Operation"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -16706,7 +17145,7 @@ func (c *ZoneOperationsListCall) Do() (*OperationList, error) {
 	//       "type": "string"
 	//     },
 	//     "project": {
-	//       "description": "Name of the project scoping this request.",
+	//       "description": "Project ID for this request.",
 	//       "location": "path",
 	//       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
 	//       "required": true,
@@ -16725,6 +17164,7 @@ func (c *ZoneOperationsListCall) Do() (*OperationList, error) {
 	//     "$ref": "OperationList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -16814,6 +17254,7 @@ func (c *ZonesGetCall) Do() (*Zone, error) {
 	//     "$ref": "Zone"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]
@@ -16944,6 +17385,7 @@ func (c *ZonesListCall) Do() (*ZoneList, error) {
 	//     "$ref": "ZoneList"
 	//   },
 	//   "scopes": [
+	//     "https://www.googleapis.com/auth/cloud-platform",
 	//     "https://www.googleapis.com/auth/compute",
 	//     "https://www.googleapis.com/auth/compute.readonly"
 	//   ]

@@ -1,0 +1,1013 @@
+{
+ "kind": "discovery#restDescription",
+ "discoveryVersion": "v1",
+ "id": "logging:v1beta3",
+ "name": "logging",
+ "version": "v1beta3",
+ "revision": "20150115",
+ "title": "Google Cloud Logging API",
+ "description": "Google Cloud Logging API lets you manage logs, ingest and retrieve log entries within a log, and manage log sinks and metrics.",
+ "ownerDomain": "google.com",
+ "ownerName": "Google",
+ "icons": {
+  "x16": "http://www.google.com/images/icons/product/search-16.gif",
+  "x32": "http://www.google.com/images/icons/product/search-32.gif"
+ },
+ "documentationLink": "",
+ "protocol": "rest",
+ "baseUrl": "https://logging.googleapis.com/v1beta3/",
+ "basePath": "/v1beta3/",
+ "rootUrl": "https://logging.googleapis.com/",
+ "servicePath": "v1beta3/",
+ "batchPath": "batch",
+ "parameters": {
+  "alt": {
+   "type": "string",
+   "description": "Data format for the response.",
+   "default": "json",
+   "enum": [
+    "json"
+   ],
+   "enumDescriptions": [
+    "Responses with Content-Type of application/json"
+   ],
+   "location": "query"
+  },
+  "fields": {
+   "type": "string",
+   "description": "Selector specifying which fields to include in a partial response.",
+   "location": "query"
+  },
+  "key": {
+   "type": "string",
+   "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+   "location": "query"
+  },
+  "oauth_token": {
+   "type": "string",
+   "description": "OAuth 2.0 token for the current user.",
+   "location": "query"
+  },
+  "prettyPrint": {
+   "type": "boolean",
+   "description": "Returns response with indentations and line breaks.",
+   "default": "true",
+   "location": "query"
+  },
+  "quotaUser": {
+   "type": "string",
+   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "location": "query"
+  },
+  "userIp": {
+   "type": "string",
+   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "location": "query"
+  }
+ },
+ "auth": {
+  "oauth2": {
+   "scopes": {
+    "https://www.googleapis.com/auth/cloud-platform": {
+     "description": "View and manage your data across Google Cloud Platform services"
+    }
+   }
+  }
+ },
+ "schemas": {
+  "Empty": {
+   "id": "Empty",
+   "type": "object"
+  },
+  "ListLogEntriesResponse": {
+   "id": "ListLogEntriesResponse",
+   "type": "object",
+   "properties": {
+    "entries": {
+     "type": "array",
+     "items": {
+      "$ref": "LogEntry"
+     }
+    },
+    "nextPageToken": {
+     "type": "string"
+    }
+   }
+  },
+  "ListLogMetricsResponse": {
+   "id": "ListLogMetricsResponse",
+   "type": "object",
+   "properties": {
+    "metrics": {
+     "type": "array",
+     "items": {
+      "$ref": "LogMetric"
+     }
+    },
+    "nextPageToken": {
+     "type": "string"
+    }
+   }
+  },
+  "ListLogServiceIndexesResponse": {
+   "id": "ListLogServiceIndexesResponse",
+   "type": "object",
+   "properties": {
+    "nextPageToken": {
+     "type": "string"
+    },
+    "serviceIndexPrefixes": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "ListLogServiceSinksResponse": {
+   "id": "ListLogServiceSinksResponse",
+   "type": "object",
+   "properties": {
+    "sinks": {
+     "type": "array",
+     "items": {
+      "$ref": "LogSink"
+     }
+    }
+   }
+  },
+  "ListLogServicesResponse": {
+   "id": "ListLogServicesResponse",
+   "type": "object",
+   "properties": {
+    "logServices": {
+     "type": "array",
+     "items": {
+      "$ref": "LogService"
+     }
+    },
+    "nextPageToken": {
+     "type": "string"
+    }
+   }
+  },
+  "ListLogSinksResponse": {
+   "id": "ListLogSinksResponse",
+   "type": "object",
+   "properties": {
+    "sinks": {
+     "type": "array",
+     "items": {
+      "$ref": "LogSink"
+     }
+    }
+   }
+  },
+  "ListLogsResponse": {
+   "id": "ListLogsResponse",
+   "type": "object",
+   "properties": {
+    "logs": {
+     "type": "array",
+     "items": {
+      "$ref": "Log"
+     }
+    },
+    "nextPageToken": {
+     "type": "string"
+    }
+   }
+  },
+  "Log": {
+   "id": "Log",
+   "type": "object",
+   "properties": {
+    "displayName": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "payloadType": {
+     "type": "string"
+    }
+   }
+  },
+  "LogEntry": {
+   "id": "LogEntry",
+   "type": "object",
+   "properties": {
+    "insertId": {
+     "type": "string"
+    },
+    "log": {
+     "type": "string"
+    },
+    "metadata": {
+     "$ref": "LogEntryMetadata"
+    },
+    "protoPayload": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "any"
+     }
+    },
+    "textPayload": {
+     "type": "string"
+    }
+   }
+  },
+  "LogEntryMetadata": {
+   "id": "LogEntryMetadata",
+   "type": "object",
+   "properties": {
+    "labels": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "string"
+     }
+    },
+    "projectId": {
+     "type": "string"
+    },
+    "projectNumber": {
+     "type": "string",
+     "format": "int64"
+    },
+    "region": {
+     "type": "string"
+    },
+    "serviceName": {
+     "type": "string"
+    },
+    "severity": {
+     "type": "string",
+     "enum": [
+      "ALERT",
+      "CRITICAL",
+      "DEBUG",
+      "DEFAULT",
+      "EMERGENCY",
+      "ERROR",
+      "INFO",
+      "NOTICE",
+      "WARNING"
+     ],
+     "enumDescriptions": [
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+     ]
+    },
+    "timeNanos": {
+     "type": "string",
+     "format": "int64"
+    },
+    "timestamp": {
+     "type": "string"
+    },
+    "userId": {
+     "type": "string"
+    },
+    "zone": {
+     "type": "string"
+    }
+   }
+  },
+  "LogError": {
+   "id": "LogError",
+   "type": "object",
+   "properties": {
+    "resource": {
+     "type": "string"
+    },
+    "status": {
+     "$ref": "Status"
+    },
+    "timeNanos": {
+     "type": "string",
+     "format": "int64"
+    }
+   }
+  },
+  "LogMetric": {
+   "id": "LogMetric",
+   "type": "object",
+   "properties": {
+    "description": {
+     "type": "string"
+    },
+    "filter": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    }
+   }
+  },
+  "LogService": {
+   "id": "LogService",
+   "type": "object",
+   "properties": {
+    "indexKeys": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "name": {
+     "type": "string"
+    }
+   }
+  },
+  "LogSink": {
+   "id": "LogSink",
+   "type": "object",
+   "properties": {
+    "destination": {
+     "type": "string"
+    },
+    "errors": {
+     "type": "array",
+     "items": {
+      "$ref": "LogError"
+     }
+    },
+    "name": {
+     "type": "string"
+    }
+   }
+  },
+  "Status": {
+   "id": "Status",
+   "type": "object",
+   "properties": {
+    "code": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "details": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "additionalProperties": {
+       "type": "any"
+      }
+     }
+    },
+    "message": {
+     "type": "string"
+    }
+   }
+  },
+  "WriteLogEntriesRequest": {
+   "id": "WriteLogEntriesRequest",
+   "type": "object",
+   "properties": {
+    "commonLabels": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "string"
+     }
+    },
+    "entries": {
+     "type": "array",
+     "items": {
+      "$ref": "LogEntry"
+     }
+    }
+   }
+  },
+  "WriteLogEntriesResponse": {
+   "id": "WriteLogEntriesResponse",
+   "type": "object"
+  }
+ },
+ "resources": {
+  "projects": {
+   "resources": {
+    "logEntries": {
+     "methods": {
+      "list": {
+       "id": "logging.projects.logEntries.list",
+       "path": "{+projectId}/logEntries",
+       "httpMethod": "GET",
+       "description": "Lists log entries in the specified project. Requires https://www.googleapis.com/auth/logging.read scope.",
+       "parameters": {
+        "filter": {
+         "type": "string",
+         "location": "query"
+        },
+        "orderBy": {
+         "type": "string",
+         "location": "query"
+        },
+        "pageSize": {
+         "type": "integer",
+         "format": "int32",
+         "location": "query"
+        },
+        "pageToken": {
+         "type": "string",
+         "location": "query"
+        },
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "response": {
+        "$ref": "ListLogEntriesResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      }
+     }
+    },
+    "logServices": {
+     "methods": {
+      "list": {
+       "id": "logging.projects.logServices.list",
+       "path": "{+projectId}/logServices",
+       "httpMethod": "GET",
+       "description": "Lists log services associated with log entries ingested for a project. Requires https://www.googleapis.com/auth/logging.read scope.",
+       "parameters": {
+        "log": {
+         "type": "string",
+         "location": "query"
+        },
+        "pageSize": {
+         "type": "integer",
+         "format": "int32",
+         "location": "query"
+        },
+        "pageToken": {
+         "type": "string",
+         "location": "query"
+        },
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "response": {
+        "$ref": "ListLogServicesResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      }
+     },
+     "resources": {
+      "indexes": {
+       "methods": {
+        "list": {
+         "id": "logging.projects.logServices.indexes.list",
+         "path": "{+service}/indexes",
+         "httpMethod": "GET",
+         "description": "Lists log service indexes associated with a log service. Requires https://www.googleapis.com/auth/logging.read scope.",
+         "parameters": {
+          "depth": {
+           "type": "integer",
+           "format": "int32",
+           "location": "query"
+          },
+          "indexPrefix": {
+           "type": "string",
+           "location": "query"
+          },
+          "log": {
+           "type": "string",
+           "location": "query"
+          },
+          "pageSize": {
+           "type": "integer",
+           "format": "int32",
+           "location": "query"
+          },
+          "pageToken": {
+           "type": "string",
+           "location": "query"
+          },
+          "service": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "service"
+         ],
+         "response": {
+          "$ref": "ListLogServiceIndexesResponse"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        }
+       }
+      },
+      "sinks": {
+       "methods": {
+        "delete": {
+         "id": "logging.projects.logServices.sinks.delete",
+         "path": "{+sink}",
+         "httpMethod": "DELETE",
+         "description": "Deletes the specified log service sink. Requires https://www.googleapis.com/auth/logging.admin scope.",
+         "parameters": {
+          "sink": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "sink"
+         ],
+         "response": {
+          "$ref": "Empty"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        },
+        "get": {
+         "id": "logging.projects.logServices.sinks.get",
+         "path": "{+sink}",
+         "httpMethod": "GET",
+         "description": "Get the specified log service sink resource. Requires https://www.googleapis.com/auth/logging.read scope.",
+         "parameters": {
+          "sink": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "sink"
+         ],
+         "response": {
+          "$ref": "LogSink"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        },
+        "list": {
+         "id": "logging.projects.logServices.sinks.list",
+         "path": "{+service}/sinks",
+         "httpMethod": "GET",
+         "description": "List log service sinks associated with the specified service. Requires https://www.googleapis.com/auth/logging.read scope.",
+         "parameters": {
+          "service": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "service"
+         ],
+         "response": {
+          "$ref": "ListLogServiceSinksResponse"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        },
+        "patch": {
+         "id": "logging.projects.logServices.sinks.patch",
+         "path": "{+sinkName}",
+         "httpMethod": "PATCH",
+         "description": "Create or update the specified log service sink resource. Requires https://www.googleapis.com/auth/logging.admin scope. This method supports patch semantics.",
+         "parameters": {
+          "sink": {
+           "type": "string",
+           "required": true,
+           "location": "query"
+          },
+          "sinkName": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "sinkName",
+          "sink"
+         ],
+         "request": {
+          "$ref": "LogSink"
+         },
+         "response": {
+          "$ref": "LogSink"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        },
+        "update": {
+         "id": "logging.projects.logServices.sinks.update",
+         "path": "{+sinkName}",
+         "httpMethod": "PUT",
+         "description": "Create or update the specified log service sink resource. Requires https://www.googleapis.com/auth/logging.admin scope.",
+         "parameters": {
+          "sinkName": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "sinkName"
+         ],
+         "request": {
+          "$ref": "LogSink"
+         },
+         "response": {
+          "$ref": "LogSink"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        }
+       }
+      }
+     }
+    },
+    "logs": {
+     "methods": {
+      "delete": {
+       "id": "logging.projects.logs.delete",
+       "path": "{+log}",
+       "httpMethod": "DELETE",
+       "description": "Deletes the specified log resource and all log entries contained in it. Requires https://www.googleapis.com/auth/logging.admin scope.",
+       "parameters": {
+        "log": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "log"
+       ],
+       "response": {
+        "$ref": "Empty"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "list": {
+       "id": "logging.projects.logs.list",
+       "path": "{+projectId}/logs",
+       "httpMethod": "GET",
+       "description": "Lists log resources belonging to the specified project. Requires https://www.googleapis.com/auth/logging.read scope.",
+       "parameters": {
+        "pageSize": {
+         "type": "integer",
+         "format": "int32",
+         "location": "query"
+        },
+        "pageToken": {
+         "type": "string",
+         "location": "query"
+        },
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "serviceIndexPrefix": {
+         "type": "string",
+         "location": "query"
+        },
+        "serviceName": {
+         "type": "string",
+         "location": "query"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "response": {
+        "$ref": "ListLogsResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      }
+     },
+     "resources": {
+      "entries": {
+       "methods": {
+        "write": {
+         "id": "logging.projects.logs.entries.write",
+         "path": "{+log}/entries:write",
+         "httpMethod": "POST",
+         "description": "Creates several log entries in a log. Requires https://www.googleapis.com/auth/logging.write scope.",
+         "parameters": {
+          "log": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "log"
+         ],
+         "request": {
+          "$ref": "WriteLogEntriesRequest"
+         },
+         "response": {
+          "$ref": "WriteLogEntriesResponse"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        }
+       }
+      },
+      "sinks": {
+       "methods": {
+        "delete": {
+         "id": "logging.projects.logs.sinks.delete",
+         "path": "{+sink}",
+         "httpMethod": "DELETE",
+         "description": "Deletes the specified log sink. Requires https://www.googleapis.com/auth/logging.admin scope.",
+         "parameters": {
+          "sink": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "sink"
+         ],
+         "response": {
+          "$ref": "Empty"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        },
+        "get": {
+         "id": "logging.projects.logs.sinks.get",
+         "path": "{+sink}",
+         "httpMethod": "GET",
+         "description": "Get the specified log sink resource. Requires https://www.googleapis.com/auth/logging.read scope.",
+         "parameters": {
+          "sink": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "sink"
+         ],
+         "response": {
+          "$ref": "LogSink"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        },
+        "list": {
+         "id": "logging.projects.logs.sinks.list",
+         "path": "{+log}/sinks",
+         "httpMethod": "GET",
+         "description": "List log sinks associated with the specified log. Requires https://www.googleapis.com/auth/logging.read scope.",
+         "parameters": {
+          "log": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "log"
+         ],
+         "response": {
+          "$ref": "ListLogSinksResponse"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        },
+        "patch": {
+         "id": "logging.projects.logs.sinks.patch",
+         "path": "{+sinkName}",
+         "httpMethod": "PATCH",
+         "description": "Create or update the specified log sink resource. Requires https://www.googleapis.com/auth/logging.admin scope. This method supports patch semantics.",
+         "parameters": {
+          "sink": {
+           "type": "string",
+           "required": true,
+           "location": "query"
+          },
+          "sinkName": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "sinkName",
+          "sink"
+         ],
+         "request": {
+          "$ref": "LogSink"
+         },
+         "response": {
+          "$ref": "LogSink"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        },
+        "update": {
+         "id": "logging.projects.logs.sinks.update",
+         "path": "{+sinkName}",
+         "httpMethod": "PUT",
+         "description": "Create or update the specified log sink resource. Requires https://www.googleapis.com/auth/logging.admin scope.",
+         "parameters": {
+          "sinkName": {
+           "type": "string",
+           "required": true,
+           "location": "path"
+          }
+         },
+         "parameterOrder": [
+          "sinkName"
+         ],
+         "request": {
+          "$ref": "LogSink"
+         },
+         "response": {
+          "$ref": "LogSink"
+         },
+         "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+         ]
+        }
+       }
+      }
+     }
+    },
+    "metrics": {
+     "methods": {
+      "delete": {
+       "id": "logging.projects.metrics.delete",
+       "path": "{+metric}",
+       "httpMethod": "DELETE",
+       "description": "Deletes the specified log metric. Requires https://www.googleapis.com/auth/logging.admin scope.",
+       "parameters": {
+        "metric": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "metric"
+       ],
+       "response": {
+        "$ref": "Empty"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "get": {
+       "id": "logging.projects.metrics.get",
+       "path": "{+metric}",
+       "httpMethod": "GET",
+       "description": "Get the specified log metric resource. Requires https://www.googleapis.com/auth/logging.read scope.",
+       "parameters": {
+        "metric": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "metric"
+       ],
+       "response": {
+        "$ref": "LogMetric"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "list": {
+       "id": "logging.projects.metrics.list",
+       "path": "{+projectId}/metrics",
+       "httpMethod": "GET",
+       "description": "List log metrics associated with the specified project. Requires https://www.googleapis.com/auth/logging.read scope.",
+       "parameters": {
+        "pageSize": {
+         "type": "integer",
+         "format": "int32",
+         "location": "query"
+        },
+        "pageToken": {
+         "type": "string",
+         "location": "query"
+        },
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "response": {
+        "$ref": "ListLogMetricsResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "patch": {
+       "id": "logging.projects.metrics.patch",
+       "path": "{+metricName}",
+       "httpMethod": "PATCH",
+       "description": "Create or update the specified log metric resource. Requires https://www.googleapis.com/auth/logging.admin scope. This method supports patch semantics.",
+       "parameters": {
+        "metric": {
+         "type": "string",
+         "required": true,
+         "location": "query"
+        },
+        "metricName": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "metricName",
+        "metric"
+       ],
+       "request": {
+        "$ref": "LogMetric"
+       },
+       "response": {
+        "$ref": "LogMetric"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "update": {
+       "id": "logging.projects.metrics.update",
+       "path": "{+metricName}",
+       "httpMethod": "PUT",
+       "description": "Create or update the specified log metric resource. Requires https://www.googleapis.com/auth/logging.admin scope.",
+       "parameters": {
+        "metricName": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "metricName"
+       ],
+       "request": {
+        "$ref": "LogMetric"
+       },
+       "response": {
+        "$ref": "LogMetric"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      }
+     }
+    }
+   }
+  }
+ }
+}

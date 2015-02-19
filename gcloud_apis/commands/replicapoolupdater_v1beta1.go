@@ -32,7 +32,7 @@ var _ = fmt.Println
 var _ = io.Copy
 var _ = os.Stdin
 
-func Replicapoolupdater_v1beta1_UpdatesCancel(context Context, args ...string) error {
+func Replicapoolupdater_v1beta1_RollingUpdatesCancel(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -45,7 +45,7 @@ func Replicapoolupdater_v1beta1_UpdatesCancel(context Context, args ...string) e
 	if err != nil {
 		return err
 	}
-	service := api_client.NewUpdatesService(api_service)
+	service := api_client.NewRollingUpdatesService(api_service)
 
 	// Only positional arguments should remain in args.
 	if len(args) != 1 {
@@ -55,8 +55,7 @@ func Replicapoolupdater_v1beta1_UpdatesCancel(context Context, args ...string) e
 	expectedParams := []string{
 		"project",
 		"zone",
-		"instanceGroupManager",
-		"updateHandle",
+		"rollingUpdate",
 	}
 	paramValues := strings.Split(args[0], "/")
 	if len(paramValues) != len(expectedParams) {
@@ -65,58 +64,11 @@ func Replicapoolupdater_v1beta1_UpdatesCancel(context Context, args ...string) e
 
 	param_project := paramValues[0]
 	param_zone := paramValues[1]
-	param_instanceGroupManager := paramValues[2]
-	param_updateHandle := paramValues[3]
+	param_rollingUpdate := paramValues[2]
 
-	call := service.Cancel(param_project, param_zone, param_instanceGroupManager, param_updateHandle)
+	call := service.Cancel(param_project, param_zone, param_rollingUpdate)
 
-	err = call.Do()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Replicapoolupdater_v1beta1_UpdatesGet(context Context, args ...string) error {
-
-	usageFunc := func() {
-		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
-
-		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
-		os.Exit(1)
-	}
-
-	api_service, err := api_client.New(context.Client)
-	if err != nil {
-		return err
-	}
-	service := api_client.NewUpdatesService(api_service)
-
-	// Only positional arguments should remain in args.
-	if len(args) != 1 {
-		usageFunc()
-	}
-
-	expectedParams := []string{
-		"project",
-		"zone",
-		"instanceGroupManager",
-		"updateHandle",
-	}
-	paramValues := strings.Split(args[0], "/")
-	if len(paramValues) != len(expectedParams) {
-		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
-	}
-
-	param_project := paramValues[0]
-	param_zone := paramValues[1]
-	param_instanceGroupManager := paramValues[2]
-	param_updateHandle := paramValues[3]
-
-	call := service.Get(param_project, param_zone, param_instanceGroupManager, param_updateHandle)
-
-	var response *api_client.Update
+	var response *api_client.Operation
 	response, err = call.Do()
 	if err != nil {
 		return err
@@ -130,7 +82,57 @@ func Replicapoolupdater_v1beta1_UpdatesGet(context Context, args ...string) erro
 	return nil
 }
 
-func Replicapoolupdater_v1beta1_UpdatesInsert(context Context, args ...string) error {
+func Replicapoolupdater_v1beta1_RollingUpdatesGet(context Context, args ...string) error {
+
+	usageFunc := func() {
+		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
+
+		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
+		os.Exit(1)
+	}
+
+	api_service, err := api_client.New(context.Client)
+	if err != nil {
+		return err
+	}
+	service := api_client.NewRollingUpdatesService(api_service)
+
+	// Only positional arguments should remain in args.
+	if len(args) != 1 {
+		usageFunc()
+	}
+
+	expectedParams := []string{
+		"project",
+		"zone",
+		"rollingUpdate",
+	}
+	paramValues := strings.Split(args[0], "/")
+	if len(paramValues) != len(expectedParams) {
+		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
+	}
+
+	param_project := paramValues[0]
+	param_zone := paramValues[1]
+	param_rollingUpdate := paramValues[2]
+
+	call := service.Get(param_project, param_zone, param_rollingUpdate)
+
+	var response *api_client.RollingUpdate
+	response, err = call.Do()
+	if err != nil {
+		return err
+	}
+
+	err = commands_util.PrintResponse(response)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Replicapoolupdater_v1beta1_RollingUpdatesInsert(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -145,7 +147,7 @@ func Replicapoolupdater_v1beta1_UpdatesInsert(context Context, args ...string) e
 	if err != nil {
 		return err
 	}
-	service := api_client.NewUpdatesService(api_service)
+	service := api_client.NewRollingUpdatesService(api_service)
 
 	args, flagValues, err := commands_util.ExtractFlagValues(args)
 	if err != nil {
@@ -157,7 +159,7 @@ func Replicapoolupdater_v1beta1_UpdatesInsert(context Context, args ...string) e
 		usageFunc()
 	}
 
-	request := &api_client.Update{}
+	request := &api_client.RollingUpdate{}
 	if len(args) == 2 {
 		err = commands_util.PopulateRequestFromFilename(&request, args[1])
 		if err != nil {
@@ -175,7 +177,6 @@ func Replicapoolupdater_v1beta1_UpdatesInsert(context Context, args ...string) e
 	expectedParams := []string{
 		"project",
 		"zone",
-		"instanceGroupManager",
 	}
 	paramValues := strings.Split(args[0], "/")
 	if len(paramValues) != len(expectedParams) {
@@ -184,13 +185,12 @@ func Replicapoolupdater_v1beta1_UpdatesInsert(context Context, args ...string) e
 
 	param_project := paramValues[0]
 	param_zone := paramValues[1]
-	param_instanceGroupManager := paramValues[2]
 
-	call := service.Insert(param_project, param_zone, param_instanceGroupManager,
+	call := service.Insert(param_project, param_zone,
 		request,
 	)
 
-	var response *api_client.InsertResponse
+	var response *api_client.Operation
 	response, err = call.Do()
 	if err != nil {
 		return err
@@ -204,10 +204,14 @@ func Replicapoolupdater_v1beta1_UpdatesInsert(context Context, args ...string) e
 	return nil
 }
 
-func Replicapoolupdater_v1beta1_UpdatesList(context Context, args ...string) error {
+func Replicapoolupdater_v1beta1_RollingUpdatesList(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
+
+		usageBits += " [--filter=VALUE]"
+
+		usageBits += " [--instanceGroupManager=VALUE]"
 
 		usageBits += " [--maxResults=VALUE]"
 
@@ -221,9 +225,112 @@ func Replicapoolupdater_v1beta1_UpdatesList(context Context, args ...string) err
 	if err != nil {
 		return err
 	}
-	service := api_client.NewUpdatesService(api_service)
+	service := api_client.NewRollingUpdatesService(api_service)
 
 	queryParamNames := map[string]bool{
+		"filter":               false,
+		"instanceGroupManager": false,
+		"maxResults":           false,
+		"pageToken":            false,
+	}
+
+	args, flagValues, err := commands_util.ExtractFlagValues(args)
+	if err != nil {
+		return err
+	}
+
+	for k, r := range queryParamNames {
+		if _, ok := flagValues[k]; r && !ok {
+			return fmt.Errorf("missing required flag %q", "--"+k)
+		}
+	}
+
+	// Only positional arguments should remain in args.
+	if len(args) != 1 {
+		usageFunc()
+	}
+
+	expectedParams := []string{
+		"project",
+		"zone",
+	}
+	paramValues := strings.Split(args[0], "/")
+	if len(paramValues) != len(expectedParams) {
+		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
+	}
+
+	param_project := paramValues[0]
+	param_zone := paramValues[1]
+
+	call := service.List(param_project, param_zone)
+
+	// Set query parameters.
+	if value, ok := flagValues["filter"]; ok {
+		query_filter, err := commands_util.ConvertValue_string(value)
+		if err != nil {
+			return err
+		}
+		call.Filter(query_filter)
+	}
+	if value, ok := flagValues["instanceGroupManager"]; ok {
+		query_instanceGroupManager, err := commands_util.ConvertValue_string(value)
+		if err != nil {
+			return err
+		}
+		call.InstanceGroupManager(query_instanceGroupManager)
+	}
+	if value, ok := flagValues["maxResults"]; ok {
+		query_maxResults, err := commands_util.ConvertValue_int64(value)
+		if err != nil {
+			return err
+		}
+		call.MaxResults(query_maxResults)
+	}
+	if value, ok := flagValues["pageToken"]; ok {
+		query_pageToken, err := commands_util.ConvertValue_string(value)
+		if err != nil {
+			return err
+		}
+		call.PageToken(query_pageToken)
+	}
+
+	var response *api_client.RollingUpdateList
+	response, err = call.Do()
+	if err != nil {
+		return err
+	}
+
+	err = commands_util.PrintResponse(response)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Replicapoolupdater_v1beta1_RollingUpdatesListInstanceUpdates(context Context, args ...string) error {
+
+	usageFunc := func() {
+		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
+
+		usageBits += " [--filter=VALUE]"
+
+		usageBits += " [--maxResults=VALUE]"
+
+		usageBits += " [--pageToken=VALUE]"
+
+		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
+		os.Exit(1)
+	}
+
+	api_service, err := api_client.New(context.Client)
+	if err != nil {
+		return err
+	}
+	service := api_client.NewRollingUpdatesService(api_service)
+
+	queryParamNames := map[string]bool{
+		"filter":     false,
 		"maxResults": false,
 		"pageToken":  false,
 	}
@@ -247,7 +354,7 @@ func Replicapoolupdater_v1beta1_UpdatesList(context Context, args ...string) err
 	expectedParams := []string{
 		"project",
 		"zone",
-		"instanceGroupManager",
+		"rollingUpdate",
 	}
 	paramValues := strings.Split(args[0], "/")
 	if len(paramValues) != len(expectedParams) {
@@ -256,11 +363,18 @@ func Replicapoolupdater_v1beta1_UpdatesList(context Context, args ...string) err
 
 	param_project := paramValues[0]
 	param_zone := paramValues[1]
-	param_instanceGroupManager := paramValues[2]
+	param_rollingUpdate := paramValues[2]
 
-	call := service.List(param_project, param_zone, param_instanceGroupManager)
+	call := service.ListInstanceUpdates(param_project, param_zone, param_rollingUpdate)
 
 	// Set query parameters.
+	if value, ok := flagValues["filter"]; ok {
+		query_filter, err := commands_util.ConvertValue_string(value)
+		if err != nil {
+			return err
+		}
+		call.Filter(query_filter)
+	}
 	if value, ok := flagValues["maxResults"]; ok {
 		query_maxResults, err := commands_util.ConvertValue_int64(value)
 		if err != nil {
@@ -276,7 +390,7 @@ func Replicapoolupdater_v1beta1_UpdatesList(context Context, args ...string) err
 		call.PageToken(query_pageToken)
 	}
 
-	var response *api_client.UpdateList
+	var response *api_client.InstanceUpdateList
 	response, err = call.Do()
 	if err != nil {
 		return err
@@ -290,7 +404,7 @@ func Replicapoolupdater_v1beta1_UpdatesList(context Context, args ...string) err
 	return nil
 }
 
-func Replicapoolupdater_v1beta1_UpdatesPause(context Context, args ...string) error {
+func Replicapoolupdater_v1beta1_RollingUpdatesPause(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -303,7 +417,7 @@ func Replicapoolupdater_v1beta1_UpdatesPause(context Context, args ...string) er
 	if err != nil {
 		return err
 	}
-	service := api_client.NewUpdatesService(api_service)
+	service := api_client.NewRollingUpdatesService(api_service)
 
 	// Only positional arguments should remain in args.
 	if len(args) != 1 {
@@ -313,8 +427,7 @@ func Replicapoolupdater_v1beta1_UpdatesPause(context Context, args ...string) er
 	expectedParams := []string{
 		"project",
 		"zone",
-		"instanceGroupManager",
-		"updateHandle",
+		"rollingUpdate",
 	}
 	paramValues := strings.Split(args[0], "/")
 	if len(paramValues) != len(expectedParams) {
@@ -323,12 +436,17 @@ func Replicapoolupdater_v1beta1_UpdatesPause(context Context, args ...string) er
 
 	param_project := paramValues[0]
 	param_zone := paramValues[1]
-	param_instanceGroupManager := paramValues[2]
-	param_updateHandle := paramValues[3]
+	param_rollingUpdate := paramValues[2]
 
-	call := service.Pause(param_project, param_zone, param_instanceGroupManager, param_updateHandle)
+	call := service.Pause(param_project, param_zone, param_rollingUpdate)
 
-	err = call.Do()
+	var response *api_client.Operation
+	response, err = call.Do()
+	if err != nil {
+		return err
+	}
+
+	err = commands_util.PrintResponse(response)
 	if err != nil {
 		return err
 	}
@@ -336,7 +454,7 @@ func Replicapoolupdater_v1beta1_UpdatesPause(context Context, args ...string) er
 	return nil
 }
 
-func Replicapoolupdater_v1beta1_UpdatesRollback(context Context, args ...string) error {
+func Replicapoolupdater_v1beta1_RollingUpdatesResume(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -349,7 +467,7 @@ func Replicapoolupdater_v1beta1_UpdatesRollback(context Context, args ...string)
 	if err != nil {
 		return err
 	}
-	service := api_client.NewUpdatesService(api_service)
+	service := api_client.NewRollingUpdatesService(api_service)
 
 	// Only positional arguments should remain in args.
 	if len(args) != 1 {
@@ -359,8 +477,7 @@ func Replicapoolupdater_v1beta1_UpdatesRollback(context Context, args ...string)
 	expectedParams := []string{
 		"project",
 		"zone",
-		"instanceGroupManager",
-		"updateHandle",
+		"rollingUpdate",
 	}
 	paramValues := strings.Split(args[0], "/")
 	if len(paramValues) != len(expectedParams) {
@@ -369,12 +486,17 @@ func Replicapoolupdater_v1beta1_UpdatesRollback(context Context, args ...string)
 
 	param_project := paramValues[0]
 	param_zone := paramValues[1]
-	param_instanceGroupManager := paramValues[2]
-	param_updateHandle := paramValues[3]
+	param_rollingUpdate := paramValues[2]
 
-	call := service.Rollback(param_project, param_zone, param_instanceGroupManager, param_updateHandle)
+	call := service.Resume(param_project, param_zone, param_rollingUpdate)
 
-	err = call.Do()
+	var response *api_client.Operation
+	response, err = call.Do()
+	if err != nil {
+		return err
+	}
+
+	err = commands_util.PrintResponse(response)
 	if err != nil {
 		return err
 	}
@@ -382,7 +504,7 @@ func Replicapoolupdater_v1beta1_UpdatesRollback(context Context, args ...string)
 	return nil
 }
 
-func Replicapoolupdater_v1beta1_UpdatesRollforward(context Context, args ...string) error {
+func Replicapoolupdater_v1beta1_RollingUpdatesRollback(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -395,7 +517,7 @@ func Replicapoolupdater_v1beta1_UpdatesRollforward(context Context, args ...stri
 	if err != nil {
 		return err
 	}
-	service := api_client.NewUpdatesService(api_service)
+	service := api_client.NewRollingUpdatesService(api_service)
 
 	// Only positional arguments should remain in args.
 	if len(args) != 1 {
@@ -405,8 +527,7 @@ func Replicapoolupdater_v1beta1_UpdatesRollforward(context Context, args ...stri
 	expectedParams := []string{
 		"project",
 		"zone",
-		"instanceGroupManager",
-		"updateHandle",
+		"rollingUpdate",
 	}
 	paramValues := strings.Split(args[0], "/")
 	if len(paramValues) != len(expectedParams) {
@@ -415,12 +536,67 @@ func Replicapoolupdater_v1beta1_UpdatesRollforward(context Context, args ...stri
 
 	param_project := paramValues[0]
 	param_zone := paramValues[1]
-	param_instanceGroupManager := paramValues[2]
-	param_updateHandle := paramValues[3]
+	param_rollingUpdate := paramValues[2]
 
-	call := service.Rollforward(param_project, param_zone, param_instanceGroupManager, param_updateHandle)
+	call := service.Rollback(param_project, param_zone, param_rollingUpdate)
 
-	err = call.Do()
+	var response *api_client.Operation
+	response, err = call.Do()
+	if err != nil {
+		return err
+	}
+
+	err = commands_util.PrintResponse(response)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Replicapoolupdater_v1beta1_ZoneOperationsGet(context Context, args ...string) error {
+
+	usageFunc := func() {
+		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
+
+		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
+		os.Exit(1)
+	}
+
+	api_service, err := api_client.New(context.Client)
+	if err != nil {
+		return err
+	}
+	service := api_client.NewZoneOperationsService(api_service)
+
+	// Only positional arguments should remain in args.
+	if len(args) != 1 {
+		usageFunc()
+	}
+
+	expectedParams := []string{
+		"project",
+		"zone",
+		"operation",
+	}
+	paramValues := strings.Split(args[0], "/")
+	if len(paramValues) != len(expectedParams) {
+		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
+	}
+
+	param_project := paramValues[0]
+	param_zone := paramValues[1]
+	param_operation := paramValues[2]
+
+	call := service.Get(param_project, param_zone, param_operation)
+
+	var response *api_client.Operation
+	response, err = call.Do()
+	if err != nil {
+		return err
+	}
+
+	err = commands_util.PrintResponse(response)
 	if err != nil {
 		return err
 	}

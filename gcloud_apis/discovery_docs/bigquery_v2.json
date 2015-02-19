@@ -4,7 +4,7 @@
  "id": "bigquery:v2",
  "name": "bigquery",
  "version": "v2",
- "revision": "20141030",
+ "revision": "20150203",
  "title": "BigQuery API",
  "description": "A data platform for customers to create, manage, share and query data.",
  "ownerDomain": "google.com",
@@ -301,6 +301,11 @@
      "$ref": "TableSchema",
      "description": "The schema of the results. Present only when the query completes successfully."
     },
+    "totalBytesProcessed": {
+     "type": "string",
+     "description": "The total number of bytes processed for this query.",
+     "format": "int64"
+    },
     "totalRows": {
      "type": "string",
      "description": "The total number of rows in the complete query result set, which can be more than the number of rows in this single page of results. Present only when the query completes successfully.",
@@ -344,6 +349,10 @@
     "status": {
      "$ref": "JobStatus",
      "description": "[Output-only] The status of this job. Examine this value when polling an asynchronous job to see if the job is complete."
+    },
+    "user_email": {
+     "type": "string",
+     "description": "[Output-only] Email address of the user who ran the job."
     }
    }
   },
@@ -475,6 +484,13 @@
      "type": "integer",
      "description": "[Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an 'invalid' error is returned in the job result and the job fails. The default value is 0, which requires that all records are valid.",
      "format": "int32"
+    },
+    "projectionFields": {
+     "type": "array",
+     "description": "[Experimental] Names(case-sensitive) of properties to keep when importing data. If this is populated, only the specified properties will be imported for each entity. Currently, this is only supported for DATASTORE_BACKUP imports and only top level properties are supported. If any specified property is not found in the Datastore 'Kind' being imported, that is an error. Note: This feature is experimental and can change in the future.",
+     "items": {
+      "type": "string"
+     }
     },
     "quote": {
      "type": "string",
@@ -638,7 +654,7 @@
        },
        "user_email": {
         "type": "string",
-        "description": "[Full-projection-only] User who ran the job."
+        "description": "[Full-projection-only] Email address of the user who ran the job."
        }
       }
      }
@@ -696,6 +712,10 @@
      "type": "string",
      "description": "[Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.",
      "format": "int64"
+    },
+    "extract": {
+     "$ref": "JobStatistics4",
+     "description": "[Output-only] Statistics for an extract job."
     },
     "load": {
      "$ref": "JobStatistics3",
@@ -755,6 +775,20 @@
      "type": "string",
      "description": "[Output-only] Number of rows imported in a load job. Note that while an import job is in the running state, this value may change.",
      "format": "int64"
+    }
+   }
+  },
+  "JobStatistics4": {
+   "id": "JobStatistics4",
+   "type": "object",
+   "properties": {
+    "destinationUriFileCounts": {
+     "type": "array",
+     "description": "[Experimental] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.",
+     "items": {
+      "type": "string",
+      "format": "int64"
+     }
     }
    }
   },
@@ -866,7 +900,7 @@
     },
     "dryRun": {
      "type": "boolean",
-     "description": "[Optional] If set, don't actually run the query. A valid query will return an empty response, while an invalid query will return the same error it would if it wasn't a dry run. The default value is false."
+     "description": "[Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run."
     },
     "kind": {
      "type": "string",
@@ -988,7 +1022,7 @@
     "lastModifiedTime": {
      "type": "string",
      "description": "[Output-only] The time when this table was last modified, in milliseconds since the epoch.",
-     "format": "int64"
+     "format": "uint64"
     },
     "numBytes": {
      "type": "string",

@@ -23,7 +23,7 @@ import (
 	"os"
 	"strings"
 
-	api_client "github.com/GoogleCloudPlatform/gcloud/gcloud_apis/clients/developerprojects/v1"
+	api_client "github.com/GoogleCloudPlatform/gcloud/gcloud_apis/clients/developerprojects/v2beta1"
 	"github.com/GoogleCloudPlatform/gcloud/gcloud_apis/commands_util"
 )
 
@@ -32,73 +32,7 @@ var _ = fmt.Println
 var _ = io.Copy
 var _ = os.Stdin
 
-func Developerprojects_v1_DeveloperProjectsInternalcreateproject(context Context, args ...string) error {
-
-	usageFunc := func() {
-		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
-
-		usageBits += " [REQUEST_FILE|-] [--REQUEST_KEY=VALUE]*"
-
-		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
-		os.Exit(1)
-	}
-
-	api_service, err := api_client.New(context.Client)
-	if err != nil {
-		return err
-	}
-	service := api_client.NewDeveloperProjectsService(api_service)
-
-	args, flagValues, err := commands_util.ExtractFlagValues(args)
-	if err != nil {
-		return err
-	}
-
-	// Only positional arguments should remain in args.
-	if len(args) == 0 || len(args) > 2 {
-		usageFunc()
-	}
-
-	request := &api_client.CreateProjectRequest1{}
-	if len(args) == 2 {
-		err = commands_util.PopulateRequestFromFilename(&request, args[1])
-		if err != nil {
-			return err
-		}
-	}
-
-	keyValues := flagValues
-
-	err = commands_util.OverwriteRequestWithValues(&request, keyValues)
-	if err != nil {
-		return err
-	}
-
-	expectedParams := []string{}
-	paramValues := strings.Split(args[0], "/")
-	if len(paramValues) != len(expectedParams) {
-		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
-	}
-
-	call := service.Internalcreateproject(
-		request,
-	)
-
-	var response *api_client.Project
-	response, err = call.Do()
-	if err != nil {
-		return err
-	}
-
-	err = commands_util.PrintResponse(response)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Developerprojects_v1_ProjectsCreate(context Context, args ...string) error {
+func Developerprojects_v2beta1_ProjectsCreate(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -201,7 +135,7 @@ func Developerprojects_v1_ProjectsCreate(context Context, args ...string) error 
 	return nil
 }
 
-func Developerprojects_v1_ProjectsDelete(context Context, args ...string) error {
+func Developerprojects_v2beta1_ProjectsDelete(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -241,7 +175,7 @@ func Developerprojects_v1_ProjectsDelete(context Context, args ...string) error 
 	return nil
 }
 
-func Developerprojects_v1_ProjectsGet(context Context, args ...string) error {
+func Developerprojects_v2beta1_ProjectsGet(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -287,7 +221,7 @@ func Developerprojects_v1_ProjectsGet(context Context, args ...string) error {
 	return nil
 }
 
-func Developerprojects_v1_ProjectsList(context Context, args ...string) error {
+func Developerprojects_v2beta1_ProjectsList(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -375,7 +309,7 @@ func Developerprojects_v1_ProjectsList(context Context, args ...string) error {
 	return nil
 }
 
-func Developerprojects_v1_ProjectsPatch(context Context, args ...string) error {
+func Developerprojects_v2beta1_ProjectsPatch(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -445,7 +379,7 @@ func Developerprojects_v1_ProjectsPatch(context Context, args ...string) error {
 	return nil
 }
 
-func Developerprojects_v1_ProjectsUndelete(context Context, args ...string) error {
+func Developerprojects_v2beta1_ProjectsUndelete(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -485,7 +419,7 @@ func Developerprojects_v1_ProjectsUndelete(context Context, args ...string) erro
 	return nil
 }
 
-func Developerprojects_v1_ProjectsUpdate(context Context, args ...string) error {
+func Developerprojects_v2beta1_ProjectsUpdate(context Context, args ...string) error {
 
 	usageFunc := func() {
 		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
@@ -542,122 +476,6 @@ func Developerprojects_v1_ProjectsUpdate(context Context, args ...string) error 
 	)
 
 	var response *api_client.Project
-	response, err = call.Do()
-	if err != nil {
-		return err
-	}
-
-	err = commands_util.PrintResponse(response)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Developerprojects_v1_V1GetIamPolicy(context Context, args ...string) error {
-
-	usageFunc := func() {
-		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
-
-		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
-		os.Exit(1)
-	}
-
-	api_service, err := api_client.New(context.Client)
-	if err != nil {
-		return err
-	}
-	service := api_client.NewV1Service(api_service)
-
-	// Only positional arguments should remain in args.
-	if len(args) != 1 {
-		usageFunc()
-	}
-
-	expectedParams := []string{
-		"resource",
-	}
-	paramValues := strings.Split(args[0], "/")
-	if len(paramValues) != len(expectedParams) {
-		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
-	}
-
-	param_resource := paramValues[0]
-
-	call := service.GetIamPolicy(param_resource)
-
-	var response *api_client.Policy
-	response, err = call.Do()
-	if err != nil {
-		return err
-	}
-
-	err = commands_util.PrintResponse(response)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Developerprojects_v1_V1SetIamPolicy(context Context, args ...string) error {
-
-	usageFunc := func() {
-		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
-
-		usageBits += " [REQUEST_FILE|-] [--REQUEST_KEY=VALUE]*"
-
-		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
-		os.Exit(1)
-	}
-
-	api_service, err := api_client.New(context.Client)
-	if err != nil {
-		return err
-	}
-	service := api_client.NewV1Service(api_service)
-
-	args, flagValues, err := commands_util.ExtractFlagValues(args)
-	if err != nil {
-		return err
-	}
-
-	// Only positional arguments should remain in args.
-	if len(args) == 0 || len(args) > 2 {
-		usageFunc()
-	}
-
-	request := &api_client.SetPolicyRequest{}
-	if len(args) == 2 {
-		err = commands_util.PopulateRequestFromFilename(&request, args[1])
-		if err != nil {
-			return err
-		}
-	}
-
-	keyValues := flagValues
-
-	err = commands_util.OverwriteRequestWithValues(&request, keyValues)
-	if err != nil {
-		return err
-	}
-
-	expectedParams := []string{
-		"resource",
-	}
-	paramValues := strings.Split(args[0], "/")
-	if len(paramValues) != len(expectedParams) {
-		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
-	}
-
-	param_resource := paramValues[0]
-
-	call := service.SetIamPolicy(param_resource,
-		request,
-	)
-
-	var response *api_client.Policy
 	response, err = call.Do()
 	if err != nil {
 		return err

@@ -2,7 +2,7 @@
 //
 // Usage example:
 //
-//   import "google.golang.org/api/developerprojects/v1"
+//   import "google.golang.org/api/developerprojects/v2beta1"
 //   ...
 //   developerprojectsService, err := developerprojects.New(oauthHttpClient)
 package developerprojects
@@ -32,10 +32,10 @@ var _ = googleapi.Version
 var _ = errors.New
 var _ = strings.Replace
 
-const apiId = "developerprojects:v1"
+const apiId = "developerprojects:v2beta1"
 const apiName = "developerprojects"
-const apiVersion = "v1"
-const basePath = "https://www.googleapis.com/developerprojects/v1/"
+const apiVersion = "v2beta1"
+const basePath = "https://www.googleapis.com/developerprojects/v2beta1/"
 
 // OAuth2 scopes used by this API.
 const (
@@ -48,9 +48,7 @@ func New(client *http.Client) (*Service, error) {
 		return nil, errors.New("client is nil")
 	}
 	s := &Service{client: client, BasePath: basePath}
-	s.DeveloperProjects = NewDeveloperProjectsService(s)
 	s.Projects = NewProjectsService(s)
-	s.V1 = NewV1Service(s)
 	return s, nil
 }
 
@@ -58,20 +56,7 @@ type Service struct {
 	client   *http.Client
 	BasePath string // API endpoint base URL
 
-	DeveloperProjects *DeveloperProjectsService
-
 	Projects *ProjectsService
-
-	V1 *V1Service
-}
-
-func NewDeveloperProjectsService(s *Service) *DeveloperProjectsService {
-	rs := &DeveloperProjectsService{s: s}
-	return rs
-}
-
-type DeveloperProjectsService struct {
-	s *Service
 }
 
 func NewProjectsService(s *Service) *ProjectsService {
@@ -81,91 +66,6 @@ func NewProjectsService(s *Service) *ProjectsService {
 
 type ProjectsService struct {
 	s *Service
-}
-
-func NewV1Service(s *Service) *V1Service {
-	rs := &V1Service{s: s}
-	return rs
-}
-
-type V1Service struct {
-	s *Service
-}
-
-type Binding struct {
-	// Members: Format of member entries: 1) * Matches any requesting
-	// principal (users, service accounts or anonymous).
-	//
-	// 2) user:$emailid A
-	// google user account using a fully qualified email address. For
-	// example alice@gmail.com, joe@bestbuy.com
-	//
-	// 3)
-	// serviceAccount:/projects/$project/serviceAccounts/$name An IAM
-	// service account with a fully qualified REST name
-	//
-	// 4)
-	// serviceAccount:$name An IAM service account with relative name.
-	//
-	// 5)
-	// group:$emailid A google group with a fully qualified email address.
-	// For example auth-ti-cloud@google.com
-	//
-	// 6)
-	// authoritySelector:/projects/$project/authoritySelectors/$name An IAM
-	// authority selector with a fully qualified REST name.
-	//
-	// 7)
-	// authoritySelector:$name An IAM authority selector with a relative
-	// name.
-	//
-	// 8) mdb:$name Ganpati group name. For example bigtable-prod,
-	// zanzibar-dev
-	//
-	// Note: It is an error to use relative IAM names for
-	// token policies. They can only be used for a resource (policy) which
-	// has a project to infer from.
-	// -------------------------------------------------------
-	Members []string `json:"members,omitempty"`
-
-	// Role: Required
-	Role string `json:"role,omitempty"`
-}
-
-type Condition struct {
-	// Iam: Trusted attributes supplied by the IAM system.
-	Iam string `json:"iam,omitempty"`
-
-	Op string `json:"op,omitempty"`
-
-	// Svc: Trusted attributes discharged by the service.
-	Svc string `json:"svc,omitempty"`
-
-	// Sys: Trusted attributes supplied by any service that owns resources
-	// and uses the IAM system for access control.
-	Sys string `json:"sys,omitempty"`
-
-	// Value: The object of the condition. Exactly one of these must be set.
-	Value string `json:"value,omitempty"`
-
-	Values []string `json:"values,omitempty"`
-}
-
-type CreateProjectRequest1 struct {
-	// AppengineStorageLocation: The storage location for the AppEngine app.
-	AppengineStorageLocation string `json:"appengineStorageLocation,omitempty"`
-
-	// CreateAppengineProject: If true, an AppEngine project will be
-	// created.
-	CreateAppengineProject bool `json:"createAppengineProject,omitempty"`
-
-	// Project: The project the user wishes to create. The user must supply
-	// the 'project_id' field, and may optionally set the 'title' field. All
-	// other fields must be unset.
-	//
-	// If the requested id is unavailable, the
-	// request will fail.
-	Project *Project `json:"project,omitempty"`
 }
 
 type ListProjectsResponse struct {
@@ -193,32 +93,6 @@ type ListProjectsResponse struct {
 	Projects []*Project `json:"projects,omitempty"`
 }
 
-type LogConfig struct {
-	Counter *LogConfigCounterOptions `json:"counter,omitempty"`
-}
-
-type LogConfigCounterOptions struct {
-	Field string `json:"field,omitempty"`
-
-	Metric string `json:"metric,omitempty"`
-}
-
-type Policy struct {
-	// Bindings: It is an error to specify multiple bindings for the same
-	// role. Bindings with no members may be silently dropped by the
-	// underlying policy storage system.
-	Bindings []*Binding `json:"bindings,omitempty"`
-
-	// Etag: Can be used to perform a read-modify-write.
-	Etag string `json:"etag,omitempty"`
-
-	Rules []*Rule `json:"rules,omitempty"`
-
-	// Version: The policy language version. The version of the policy
-	// itself is represented by the etag.
-	Version int64 `json:"version,omitempty"`
-}
-
 type Project struct {
 	// AppengineName: Name identifying legacy projects. This field should
 	// not be used for new projects. This field is read-only.
@@ -229,8 +103,6 @@ type Project struct {
 	//
 	// This is a read-only field.
 	CreatedMs int64 `json:"createdMs,omitempty,string"`
-
-	Deprecated5 string `json:"deprecated5,omitempty"`
 
 	// Labels: The labels associated with this project.
 	Labels []*ProjectLabelsEntry `json:"labels,omitempty"`
@@ -269,125 +141,6 @@ type ProjectLabelsEntry struct {
 	Key string `json:"key,omitempty"`
 
 	Value string `json:"value,omitempty"`
-}
-
-type Rule struct {
-	// Action: Required
-	Action string `json:"action,omitempty"`
-
-	// Conditions: Additional restrictions that must be met
-	Conditions []*Condition `json:"conditions,omitempty"`
-
-	// Description: Human-readable description of the rule.
-	Description string `json:"description,omitempty"`
-
-	// In: The rule matches if the PRINCIPAL/AUTHORITY_SELECTOR is in this
-	// set of entries.
-	In []string `json:"in,omitempty"`
-
-	// LogConfig: The config returned to callers of tech.iam.IAM.CheckPolicy
-	// for any entries that match the LOG action.
-	LogConfig []*LogConfig `json:"logConfig,omitempty"`
-
-	// NotIn: The rule matches if the PRINCIPAL/AUTHORITY_SELECTOR is not in
-	// this set of entries.
-	NotIn []string `json:"notIn,omitempty"`
-
-	// Permissions: A permission is a string of form '$type.$action' (e.g.,
-	// 'storage.read').
-	Permissions []string `json:"permissions,omitempty"`
-}
-
-type SetPolicyRequest struct {
-	// ChangeDescription: Human readable summary of change, reason for
-	// change, who requested the change etc. for auditing purposes. TODO: Do
-	// we need more structure here for higher level tools?
-	ChangeDescription string `json:"changeDescription,omitempty"`
-
-	// Policy: REQUIRED: The complete policy to be applied to the
-	// 'resource'. The size of the policy is limited to a few 10s of KB. An
-	// empty policy is in general a valid policy but certain services (like
-	// Projects) might reject them.
-	Policy *Policy `json:"policy,omitempty"`
-
-	// Wait: If true the SetPolicy call returns only after it is guaranteed
-	// that a subsequent CheckPolicy call will observe the new policy. NOTE:
-	// We may support this guarantee only for policy changes that broaden
-	// access.
-	Wait bool `json:"wait,omitempty"`
-}
-
-// method id "developerprojects.developerProjects.internalcreateproject":
-
-type DeveloperProjectsInternalcreateprojectCall struct {
-	s                     *Service
-	createprojectrequest1 *CreateProjectRequest1
-	opt_                  map[string]interface{}
-}
-
-// Internalcreateproject: Creates a project resource. This should
-// produce the same project as CreateProject.
-func (r *DeveloperProjectsService) Internalcreateproject(createprojectrequest1 *CreateProjectRequest1) *DeveloperProjectsInternalcreateprojectCall {
-	c := &DeveloperProjectsInternalcreateprojectCall{s: r.s, opt_: make(map[string]interface{})}
-	c.createprojectrequest1 = createprojectrequest1
-	return c
-}
-
-// Fields allows partial responses to be retrieved.
-// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *DeveloperProjectsInternalcreateprojectCall) Fields(s ...googleapi.Field) *DeveloperProjectsInternalcreateprojectCall {
-	c.opt_["fields"] = googleapi.CombineFields(s)
-	return c
-}
-
-func (c *DeveloperProjectsInternalcreateprojectCall) Do() (*Project, error) {
-	var body io.Reader = nil
-	body, err := googleapi.WithoutDataWrapper.JSONReader(c.createprojectrequest1)
-	if err != nil {
-		return nil, err
-	}
-	ctype := "application/json"
-	params := make(url.Values)
-	params.Set("alt", "json")
-	if v, ok := c.opt_["fields"]; ok {
-		params.Set("fields", fmt.Sprintf("%v", v))
-	}
-	urls := googleapi.ResolveRelative(c.s.BasePath, "developerProjects/internalcreateproject")
-	urls += "?" + params.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
-	googleapi.SetOpaque(req.URL)
-	req.Header.Set("Content-Type", ctype)
-	req.Header.Set("User-Agent", "google-api-go-client/0.5")
-	res, err := c.s.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, err
-	}
-	var ret *Project
-	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "Creates a project resource. This should produce the same project as CreateProject.",
-	//   "httpMethod": "POST",
-	//   "id": "developerprojects.developerProjects.internalcreateproject",
-	//   "path": "developerProjects/internalcreateproject",
-	//   "request": {
-	//     "$ref": "CreateProjectRequest1"
-	//   },
-	//   "response": {
-	//     "$ref": "Project"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-platform"
-	//   ]
-	// }
-
 }
 
 // method id "developerprojects.projects.create":
@@ -993,173 +746,6 @@ func (c *ProjectsUpdateCall) Do() (*Project, error) {
 	//   },
 	//   "response": {
 	//     "$ref": "Project"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-platform"
-	//   ]
-	// }
-
-}
-
-// method id "developerprojects.v1.getIamPolicy":
-
-type V1GetIamPolicyCall struct {
-	s        *Service
-	resource string
-	opt_     map[string]interface{}
-}
-
-// GetIamPolicy: Returns the IAM access control policy for specified
-// project. Resource should be in format: "/projectid" Uses POST instead
-// of GET because Protiary v2 can't support repeated messages in GET
-// requests.
-func (r *V1Service) GetIamPolicy(resource string) *V1GetIamPolicyCall {
-	c := &V1GetIamPolicyCall{s: r.s, opt_: make(map[string]interface{})}
-	c.resource = resource
-	return c
-}
-
-// Fields allows partial responses to be retrieved.
-// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *V1GetIamPolicyCall) Fields(s ...googleapi.Field) *V1GetIamPolicyCall {
-	c.opt_["fields"] = googleapi.CombineFields(s)
-	return c
-}
-
-func (c *V1GetIamPolicyCall) Do() (*Policy, error) {
-	var body io.Reader = nil
-	params := make(url.Values)
-	params.Set("alt", "json")
-	if v, ok := c.opt_["fields"]; ok {
-		params.Set("fields", fmt.Sprintf("%v", v))
-	}
-	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+resource}:getIamPolicy")
-	urls += "?" + params.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
-	googleapi.Expand(req.URL, map[string]string{
-		"resource": c.resource,
-	})
-	req.Header.Set("User-Agent", "google-api-go-client/0.5")
-	res, err := c.s.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, err
-	}
-	var ret *Policy
-	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "Returns the IAM access control policy for specified project. Resource should be in format: \"/projectid\" Uses POST instead of GET because Protiary v2 can't support repeated messages in GET requests.",
-	//   "httpMethod": "POST",
-	//   "id": "developerprojects.v1.getIamPolicy",
-	//   "parameterOrder": [
-	//     "resource"
-	//   ],
-	//   "parameters": {
-	//     "resource": {
-	//       "description": "REQUIRED: The resource for which policy is being requested. Usually some path like projects/{$project}/zones/{$zone}/disks/{$disk}.",
-	//       "location": "path",
-	//       "required": true,
-	//       "type": "string"
-	//     }
-	//   },
-	//   "path": "v1/{+resource}:getIamPolicy",
-	//   "response": {
-	//     "$ref": "Policy"
-	//   },
-	//   "scopes": [
-	//     "https://www.googleapis.com/auth/cloud-platform"
-	//   ]
-	// }
-
-}
-
-// method id "developerprojects.v1.setIamPolicy":
-
-type V1SetIamPolicyCall struct {
-	s                *Service
-	resource         string
-	setpolicyrequest *SetPolicyRequest
-	opt_             map[string]interface{}
-}
-
-// SetIamPolicy: Sets the IAM access control policy for the specified
-// project. Resource should be in format: "/projectid"
-func (r *V1Service) SetIamPolicy(resource string, setpolicyrequest *SetPolicyRequest) *V1SetIamPolicyCall {
-	c := &V1SetIamPolicyCall{s: r.s, opt_: make(map[string]interface{})}
-	c.resource = resource
-	c.setpolicyrequest = setpolicyrequest
-	return c
-}
-
-// Fields allows partial responses to be retrieved.
-// See https://developers.google.com/gdata/docs/2.0/basics#PartialResponse
-// for more information.
-func (c *V1SetIamPolicyCall) Fields(s ...googleapi.Field) *V1SetIamPolicyCall {
-	c.opt_["fields"] = googleapi.CombineFields(s)
-	return c
-}
-
-func (c *V1SetIamPolicyCall) Do() (*Policy, error) {
-	var body io.Reader = nil
-	body, err := googleapi.WithoutDataWrapper.JSONReader(c.setpolicyrequest)
-	if err != nil {
-		return nil, err
-	}
-	ctype := "application/json"
-	params := make(url.Values)
-	params.Set("alt", "json")
-	if v, ok := c.opt_["fields"]; ok {
-		params.Set("fields", fmt.Sprintf("%v", v))
-	}
-	urls := googleapi.ResolveRelative(c.s.BasePath, "v1/{+resource}:setIamPolicy")
-	urls += "?" + params.Encode()
-	req, _ := http.NewRequest("POST", urls, body)
-	googleapi.Expand(req.URL, map[string]string{
-		"resource": c.resource,
-	})
-	req.Header.Set("Content-Type", ctype)
-	req.Header.Set("User-Agent", "google-api-go-client/0.5")
-	res, err := c.s.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer googleapi.CloseBody(res)
-	if err := googleapi.CheckResponse(res); err != nil {
-		return nil, err
-	}
-	var ret *Policy
-	if err := json.NewDecoder(res.Body).Decode(&ret); err != nil {
-		return nil, err
-	}
-	return ret, nil
-	// {
-	//   "description": "Sets the IAM access control policy for the specified project. Resource should be in format: \"/projectid\"",
-	//   "httpMethod": "POST",
-	//   "id": "developerprojects.v1.setIamPolicy",
-	//   "parameterOrder": [
-	//     "resource"
-	//   ],
-	//   "parameters": {
-	//     "resource": {
-	//       "description": "REQUIRED: The resource for which policy is being specified. Usually some path like projects/{$project}/zones/{$zone}/disks/{$disk}.",
-	//       "location": "path",
-	//       "required": true,
-	//       "type": "string"
-	//     }
-	//   },
-	//   "path": "v1/{+resource}:setIamPolicy",
-	//   "request": {
-	//     "$ref": "SetPolicyRequest"
-	//   },
-	//   "response": {
-	//     "$ref": "Policy"
 	//   },
 	//   "scopes": [
 	//     "https://www.googleapis.com/auth/cloud-platform"
