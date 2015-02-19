@@ -4,7 +4,7 @@
  "id": "dns:v1beta1",
  "name": "dns",
  "version": "v1beta1",
- "revision": "20141030",
+ "revision": "20150218",
  "title": "Google Cloud DNS API",
  "description": "The Google Cloud DNS API provides services for configuring and serving authoritative DNS records.",
  "ownerDomain": "google.com",
@@ -153,7 +153,7 @@
     },
     "description": {
      "type": "string",
-     "description": "A string to associate with this resource for the user's convenience. Has no effect on the managed zone's function."
+     "description": "A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function."
     },
     "dnsName": {
      "type": "string",
@@ -171,7 +171,11 @@
     },
     "name": {
      "type": "string",
-     "description": "User assigned name for this resource. Must be unique within the project."
+     "description": "User assigned name for this resource. Must be unique within the project. The name must be 1-32 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes."
+    },
+    "nameServerSet": {
+     "type": "string",
+     "description": "Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users will leave this field unset."
     },
     "nameServers": {
      "type": "array",

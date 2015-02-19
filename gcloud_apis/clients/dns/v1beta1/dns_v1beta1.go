@@ -163,8 +163,9 @@ type ManagedZone struct {
 	// This is in RFC3339 text format. Output only.
 	CreationTime string `json:"creationTime,omitempty"`
 
-	// Description: A string to associate with this resource for the user's
-	// convenience. Has no effect on the managed zone's function.
+	// Description: A mutable string of at most 1024 characters associated
+	// with this resource for the user's convenience. Has no effect on the
+	// managed zone's function.
 	Description string `json:"description,omitempty"`
 
 	// DnsName: The DNS name of this managed zone, for instance
@@ -180,8 +181,15 @@ type ManagedZone struct {
 	Kind string `json:"kind,omitempty"`
 
 	// Name: User assigned name for this resource. Must be unique within the
-	// project.
+	// project. The name must be 1-32 characters long, must begin with a
+	// letter, end with a letter or digit, and only contain lowercase
+	// letters, digits or dashes.
 	Name string `json:"name,omitempty"`
+
+	// NameServerSet: Optionally specifies the NameServerSet for this
+	// ManagedZone. A NameServerSet is a set of DNS name servers that all
+	// host the same ManagedZones. Most users will leave this field unset.
+	NameServerSet string `json:"nameServerSet,omitempty"`
 
 	// NameServers: Delegate your managed_zone to these virtual name
 	// servers; defined by the server (output only)

@@ -4,7 +4,7 @@
  "id": "compute:v1",
  "name": "compute",
  "version": "v1",
- "revision": "20141030",
+ "revision": "20150104",
  "title": "Compute Engine API",
  "description": "API for the Google Compute Engine service.",
  "ownerDomain": "google.com",
@@ -68,6 +68,9 @@
  "auth": {
   "oauth2": {
    "scopes": {
+    "https://www.googleapis.com/auth/cloud-platform": {
+     "description": "View and manage your data across Google Cloud Platform services"
+    },
     "https://www.googleapis.com/auth/compute": {
      "description": "View and manage your Google Compute Engine resources"
     },
@@ -94,7 +97,7 @@
    "properties": {
     "kind": {
      "type": "string",
-     "description": "Type of the resource.",
+     "description": "[Output Only] Type of the resource. Always compute#accessConfig for access configs.",
      "default": "compute#accessConfig"
     },
     "name": {
@@ -103,11 +106,11 @@
     },
     "natIP": {
      "type": "string",
-     "description": "An external IP address associated with this instance. Specify an unused static IP address available to the project. If not specified, the external IP will be drawn from a shared ephemeral pool."
+     "description": "An external IP address associated with this instance. Specify an unused static external IP address available to the project or leave this field undefined to use an IP from a shared ephemeral IP address pool. If you specify a static external IP address, it must live in the same region as the zone of the instance."
     },
     "type": {
      "type": "string",
-     "description": "Type of configuration. Must be set to \"ONE_TO_ONE_NAT\". This configures port-for-port NAT to the internet.",
+     "description": "The type of configuration. The default and only option is ONE_TO_ONE_NAT.",
      "default": "ONE_TO_ONE_NAT",
      "enum": [
       "ONE_TO_ONE_NAT"
@@ -226,7 +229,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The address resources.",
+     "description": "A list of Address resources.",
      "items": {
       "$ref": "Address"
      }
@@ -263,7 +266,7 @@
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -295,24 +298,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -325,24 +328,24 @@
    "properties": {
     "autoDelete": {
      "type": "boolean",
-     "description": "Whether the disk will be auto-deleted when the instance is deleted (but not when the disk is detached from the instance)."
+     "description": "Specifies whether the disk will be auto-deleted when the instance is deleted (but not when the disk is detached from the instance)."
     },
     "boot": {
      "type": "boolean",
-     "description": "Indicates that this is a boot disk. VM will use the first partition of the disk for its root filesystem."
+     "description": "Indicates that this is a boot disk. The virtual machine will use the first partition of the disk for its root filesystem."
     },
     "deviceName": {
      "type": "string",
-     "description": "Persistent disk only; must be unique within the instance when specified. This represents a unique device name that is reflected into the /dev/ tree of a Linux operating system running within the instance. If not specified, a default will be chosen by the system."
+     "description": "Specifies a unique device name of your choice that is reflected into the /dev/ tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance.\n\nIf not specified, the server chooses a default device name to apply to this disk, in the form persistent-disks-x, where x is a number assigned by Google Compute Engine. This field is only applicable for persistent disks."
     },
     "index": {
      "type": "integer",
-     "description": "A zero-based index to assign to this disk, where 0 is reserved for the boot disk. If not specified, the server will choose an appropriate value (output only).",
+     "description": "Assigns a zero-based index to this disk, where 0 is reserved for the boot disk. For example, if you have many disks attached to an instance, each disk would have a unique index number. If not specified, the server will choose an appropriate value.",
      "format": "int32"
     },
     "initializeParams": {
      "$ref": "AttachedDiskInitializeParams",
-     "description": "Initialization parameters."
+     "description": "[Input Only] Specifies the parameters for a new disk that will be created alongside the new instance. Use initialization parameters to create boot disks or local SSDs attached to the new instance.\n\nThis property is mutually exclusive with the source property; you can only define one or the other, but not both."
     },
     "interface": {
      "type": "string",
@@ -357,19 +360,19 @@
     },
     "kind": {
      "type": "string",
-     "description": "Type of the resource.",
+     "description": "[Output Only] Type of the resource. Always compute#attachedDisk for attached disks.",
      "default": "compute#attachedDisk"
     },
     "licenses": {
      "type": "array",
-     "description": "Public visible licenses.",
+     "description": "[Output Only] Any valid publicly visible licenses.",
      "items": {
       "type": "string"
      }
     },
     "mode": {
      "type": "string",
-     "description": "The mode in which to attach this disk, either \"READ_WRITE\" or \"READ_ONLY\".",
+     "description": "The mode in which to attach this disk, either READ_WRITE or READ_ONLY. If not specified, the default is to attach the disk in READ_WRITE mode.",
      "enum": [
       "READ_ONLY",
       "READ_WRITE"
@@ -381,11 +384,11 @@
     },
     "source": {
      "type": "string",
-     "description": "Persistent disk only; the URL of the persistent disk resource."
+     "description": "Specifies a valid partial or full URL to an existing Persistent Disk resource. This field is only applicable for persistent disks."
     },
     "type": {
      "type": "string",
-     "description": "Type of the disk, either \"SCRATCH\" or \"PERSISTENT\". Note that persistent disks must be created before you can specify them here.",
+     "description": "Specifies the type of the disk, either SCRATCH or PERSISTENT. If not specified, the default is PERSISTENT.",
      "enum": [
       "PERSISTENT",
       "SCRATCH"
@@ -405,24 +408,24 @@
   "AttachedDiskInitializeParams": {
    "id": "AttachedDiskInitializeParams",
    "type": "object",
-   "description": "Initialization parameters for the new disk (input-only). Can only be specified on the boot disk or local SSDs. Mutually exclusive with 'source'.",
+   "description": "[Input Only] Specifies the parameters for a new disk that will be created alongside the new instance. Use initialization parameters to create boot disks or local SSDs attached to the new instance.\n\nThis property is mutually exclusive with the source property; you can only define one or the other, but not both.",
    "properties": {
     "diskName": {
      "type": "string",
-     "description": "Name of the disk (when not provided defaults to the name of the instance)."
+     "description": "Specifies the disk name. If not specified, the default is to use the name of the instance."
     },
     "diskSizeGb": {
      "type": "string",
-     "description": "Size of the disk in base-2 GB.",
+     "description": "Specifies the size of the disk in base-2 GB.",
      "format": "int64"
     },
     "diskType": {
      "type": "string",
-     "description": "URL of the disk type resource describing which disk type to use to create the disk; provided by the client when the disk is created."
+     "description": "Specifies the disk type to use to create the instance. If not specified, the default is pd-standard, specified using the full URL. For example:\n\nhttps://www.googleapis.com/compute/v1/projects/project/zones/zone/diskTypes/pd-standard \n\nOther values include pd-ssd and local-ssd. If you define this field, you can provide either the full or partial URL. For example, the following are valid values:  \n- https://www.googleapis.com/compute/v1/projects/project/zones/zone/diskTypes/diskType \n- projects/project/zones/zone/diskTypes/diskType \n- zones/zone/diskTypes/diskType"
     },
     "sourceImage": {
      "type": "string",
-     "description": "The source image used to create this disk."
+     "description": "A source image used to create the disk. You can provide a private (custom) image, and Compute Engine will use the corresponding image from your project. For example:\n\nglobal/images/my-private-image \n\nOr you can provide an image from a publicly-available project. For example, to use a Debian image from the debian-cloud project, make sure to include the project in the URL:\n\nprojects/debian-cloud/global/images/debian-7-wheezy-vYYYYMMDD \n\nwhere vYYYYMMDD is the image version. The fully-qualified URL will also work in both cases."
     }
    }
   },
@@ -577,7 +580,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The BackendService resources.",
+     "description": "A list of BackendService resources.",
      "items": {
       "$ref": "BackendService"
      }
@@ -616,11 +619,11 @@
     },
     "replacement": {
      "type": "string",
-     "description": "A URL of the suggested replacement for the deprecated resource. The deprecated resource and its replacement must be resources of the same kind."
+     "description": "The URL of the suggested replacement for a deprecated resource. The suggested replacement resource must be the same kind of resource as the deprecated resource."
     },
     "state": {
      "type": "string",
-     "description": "The deprecation state. Can be \"DEPRECATED\", \"OBSOLETE\", or \"DELETED\". Operations which create a new resource using a \"DEPRECATED\" resource will return successfully, but with a warning indicating the deprecated resource and recommending its replacement. New uses of \"OBSOLETE\" or \"DELETED\" resources will result in an error.",
+     "description": "The deprecation state of this resource. This can be DEPRECATED, OBSOLETE, or DELETED. Operations which create a new resource using a DEPRECATED resource will return successfully, but with a warning indicating the deprecated resource and recommending its replacement. Operations which use OBSOLETE or DELETED resources will be rejected and result in an error.",
      "enum": [
       "DELETED",
       "DEPRECATED",
@@ -771,7 +774,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The persistent disk resources.",
+     "description": "A list of Disk resources.",
      "items": {
       "$ref": "Disk"
      }
@@ -884,7 +887,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The disk type resources.",
+     "description": "A list of DiskType resources.",
      "items": {
       "$ref": "DiskType"
      }
@@ -921,7 +924,7 @@
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -953,24 +956,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -993,7 +996,7 @@
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -1025,24 +1028,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -1144,7 +1147,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The firewall resources.",
+     "description": "A list of Firewall resources.",
      "items": {
       "$ref": "Firewall"
      }
@@ -1274,7 +1277,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The ForwardingRule resources.",
+     "description": "A list of ForwardingRule resources.",
      "items": {
       "$ref": "ForwardingRule"
      }
@@ -1311,7 +1314,7 @@
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -1343,24 +1346,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -1484,7 +1487,7 @@
     },
     "timeoutSec": {
      "type": "integer",
-     "description": "How long (in seconds) to wait before claiming failure. The default value is 5 seconds.",
+     "description": "How long (in seconds) to wait before claiming failure. The default value is 5 seconds. It is invalid for timeoutSec to have greater value than checkIntervalSec.",
      "format": "int32"
     },
     "unhealthyThreshold": {
@@ -1505,7 +1508,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The HttpHealthCheck resources.",
+     "description": "A list of HttpHealthCheck resources.",
      "items": {
       "$ref": "HttpHealthCheck"
      }
@@ -1659,7 +1662,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The disk image resources.",
+     "description": "A list of Image resources.",
      "items": {
       "$ref": "Image"
      }
@@ -1682,15 +1685,15 @@
   "Instance": {
    "id": "Instance",
    "type": "object",
-   "description": "An instance resource.",
+   "description": "An Instance resource.",
    "properties": {
     "canIpForward": {
      "type": "boolean",
-     "description": "Allows this instance to send packets with source IP addresses other than its own and receive packets with destination IP addresses other than its own. If this instance will be used as an IP gateway or it will be set as the next-hop in a Route resource, say true. If unsure, leave this set to false."
+     "description": "Allows this instance to send and receive packets with non-matching destination or source IPs. This is required if you plan to use this instance to forward routes. For more information, see Enabling IP Forwarding."
     },
     "creationTimestamp": {
      "type": "string",
-     "description": "Creation timestamp in RFC3339 text format (output only)."
+     "description": "[Output Only] Creation timestamp in RFC3339 text format."
     },
     "description": {
      "type": "string",
@@ -1705,17 +1708,17 @@
     },
     "id": {
      "type": "string",
-     "description": "Unique identifier for the resource; defined by the server (output only).",
+     "description": "[Output Only] Unique identifier for the resource; defined by the server.",
      "format": "uint64"
     },
     "kind": {
      "type": "string",
-     "description": "Type of the resource.",
+     "description": "[Output Only] Type of the resource. Always compute#instance for instances.",
      "default": "compute#instance"
     },
     "machineType": {
      "type": "string",
-     "description": "URL of the machine type resource describing which machine type to use to host the instance; provided by the client when the instance is created.",
+     "description": "Full or partial URL of the machine type resource to use for this instance. This is provided by the client when the instance is created. For example, the following is a valid partial url:\n\nzones/zone/machineTypes/machine-type",
      "annotations": {
       "required": [
        "compute.instances.insert"
@@ -1724,21 +1727,15 @@
     },
     "metadata": {
      "$ref": "Metadata",
-     "description": "Metadata key/value pairs assigned to this instance. Consists of custom metadata or predefined keys; see Instance documentation for more information."
+     "description": "The metadata key/value pairs assigned to this instance. This includes custom metadata and predefined keys."
     },
     "name": {
      "type": "string",
-     "description": "Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035.",
-     "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
-     "annotations": {
-      "required": [
-       "compute.instances.insert"
-      ]
-     }
+     "description": "Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression [a-z]([-a-z0-9]*[a-z0-9])? which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash."
     },
     "networkInterfaces": {
      "type": "array",
-     "description": "Array of configurations for this interface. This specifies how this interface is configured to interact with other network services, such as connecting to the internet. Currently, ONE_TO_ONE_NAT is the only access config supported. If there are no accessConfigs specified, then this instance will have no external internet access.",
+     "description": "An array of configurations for this interface. This specifies how this interface is configured to interact with other network services, such as connecting to the internet.",
      "items": {
       "$ref": "NetworkInterface"
      }
@@ -1749,18 +1746,18 @@
     },
     "selfLink": {
      "type": "string",
-     "description": "Server defined URL for this resource (output only)."
+     "description": "[Output Only] Server defined URL for this resource."
     },
     "serviceAccounts": {
      "type": "array",
-     "description": "A list of service accounts each with specified scopes, for which access tokens are to be made available to the instance through metadata queries.",
+     "description": "A list of service accounts, with their specified scopes, authorized for this instance. Service accounts generate access tokens that can be accessed through the metadata server and used to authenticate applications on the instance. See Authenticating from Google Compute Engine for more information.",
      "items": {
       "$ref": "ServiceAccount"
      }
     },
     "status": {
      "type": "string",
-     "description": "Instance status. One of the following values: \"PROVISIONING\", \"STAGING\", \"RUNNING\", \"STOPPING\", \"STOPPED\", \"TERMINATED\" (output only).",
+     "description": "[Output Only] The status of the instance. One of the following values: PROVISIONING, STAGING, RUNNING, STOPPING, STOPPED, TERMINATED.",
      "enum": [
       "PROVISIONING",
       "RUNNING",
@@ -1780,15 +1777,15 @@
     },
     "statusMessage": {
      "type": "string",
-     "description": "An optional, human-readable explanation of the status (output only)."
+     "description": "[Output Only] An optional, human-readable explanation of the status."
     },
     "tags": {
      "$ref": "Tags",
-     "description": "A list of tags to be applied to this instance. Used to identify valid sources or targets for network firewalls. Provided by the client on instance creation. The tags can be later modified by the setTags method. Each tag within the list must comply with RFC1035."
+     "description": "A list of tags to appy to this instance. Tags are used to identify valid sources or targets for network firewalls and are specified by the client during instance creation. The tags can be later modified by the setTags method. Each tag within the list must comply with RFC1035."
     },
     "zone": {
      "type": "string",
-     "description": "URL of the zone where the instance resides (output only)."
+     "description": "[Output Only] URL of the zone where the instance resides."
     }
    }
   },
@@ -1798,11 +1795,11 @@
    "properties": {
     "id": {
      "type": "string",
-     "description": "Unique identifier for the resource; defined by the server (output only)."
+     "description": "[Output Only] Unique identifier for the resource; defined by the server."
     },
     "items": {
      "type": "object",
-     "description": "A map of scoped instance lists.",
+     "description": "[Output Only] A map of scoped instance lists.",
      "additionalProperties": {
       "$ref": "InstancesScopedList",
       "description": "Name of the scope containing this set of instances."
@@ -1810,16 +1807,16 @@
     },
     "kind": {
      "type": "string",
-     "description": "Type of resource.",
+     "description": "[Output Only] Type of resource. Always compute#instanceAggregatedList for aggregated lists of Instance resources.",
      "default": "compute#instanceAggregatedList"
     },
     "nextPageToken": {
      "type": "string",
-     "description": "A token used to continue a truncated list request (output only)."
+     "description": "[Output Only] A token used to continue a truncated list request."
     },
     "selfLink": {
      "type": "string",
-     "description": "Server defined URL for this resource (output only)."
+     "description": "[Output Only] Server defined URL for this resource."
     }
    }
   },
@@ -1830,27 +1827,27 @@
    "properties": {
     "id": {
      "type": "string",
-     "description": "Unique identifier for the resource; defined by the server (output only)."
+     "description": "[Output Only] Unique identifier for the resource; defined by the server."
     },
     "items": {
      "type": "array",
-     "description": "A list of instance resources.",
+     "description": "[Output Only] A list of Instance resources.",
      "items": {
       "$ref": "Instance"
      }
     },
     "kind": {
      "type": "string",
-     "description": "Type of resource.",
+     "description": "[Output Only] Type of resource. Always compute#instanceList for lists of Instance resources.",
      "default": "compute#instanceList"
     },
     "nextPageToken": {
      "type": "string",
-     "description": "A token used to continue a truncated list request (output only)."
+     "description": "[Output Only] A token used to continue a truncated list request."
     },
     "selfLink": {
      "type": "string",
-     "description": "Server defined URL for this resource (output only)."
+     "description": "[Output Only] Server defined URL for this resource."
     }
    }
   },
@@ -1974,7 +1971,7 @@
     },
     "items": {
      "type": "array",
-     "description": "A list of instance template resources.",
+     "description": "A list of InstanceTemplate resources.",
      "items": {
       "$ref": "InstanceTemplate"
      }
@@ -2000,18 +1997,18 @@
    "properties": {
     "instances": {
      "type": "array",
-     "description": "List of instances contained in this scope.",
+     "description": "[Output Only] List of instances contained in this scope.",
      "items": {
       "$ref": "Instance"
      }
     },
     "warning": {
      "type": "object",
-     "description": "Informational warning which replaces the list of instances when the list is empty.",
+     "description": "[Output Only] Informational warning which replaces the list of instances when the list is empty.",
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -2043,24 +2040,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -2103,7 +2100,7 @@
    "properties": {
     "creationTimestamp": {
      "type": "string",
-     "description": "Creation timestamp in RFC3339 text format (output only)."
+     "description": "[Output Only] Creation timestamp in RFC3339 text format."
     },
     "deprecated": {
      "$ref": "DeprecationStatus",
@@ -2120,7 +2117,7 @@
     },
     "id": {
      "type": "string",
-     "description": "Unique identifier for the resource; defined by the server (output only).",
+     "description": "[Output Only] Unique identifier for the resource; defined by the server.",
      "format": "uint64"
     },
     "imageSpaceGb": {
@@ -2169,11 +2166,11 @@
     },
     "selfLink": {
      "type": "string",
-     "description": "Server defined URL for the resource (output only)."
+     "description": "[Output Only] Server defined URL for the resource."
     },
     "zone": {
      "type": "string",
-     "description": "Url of the zone where the machine type resides (output only)."
+     "description": "[Output Only] The name of the zone where the machine type resides, such as us-central1-a."
     }
    }
   },
@@ -2183,7 +2180,7 @@
    "properties": {
     "id": {
      "type": "string",
-     "description": "Unique identifier for the resource; defined by the server (output only)."
+     "description": "[Output Only] Unique identifier for the resource; defined by the server."
     },
     "items": {
      "type": "object",
@@ -2200,7 +2197,7 @@
     },
     "nextPageToken": {
      "type": "string",
-     "description": "A token used to continue a truncated list request (output only)."
+     "description": "[Output Only] A token used to continue a truncated list request."
     },
     "selfLink": {
      "type": "string",
@@ -2219,7 +2216,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The machine type resources.",
+     "description": "A list of MachineType resources.",
      "items": {
       "$ref": "MachineType"
      }
@@ -2252,11 +2249,11 @@
     },
     "warning": {
      "type": "object",
-     "description": "Informational warning which replaces the list of machine types when the list is empty.",
+     "description": "An informational warning that appears when the machine types list is empty.",
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -2288,24 +2285,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -2318,7 +2315,7 @@
    "properties": {
     "fingerprint": {
      "type": "string",
-     "description": "Fingerprint of this resource. A hash of the metadata's contents. This field is used for optimistic locking. An up-to-date metadata fingerprint must be provided in order to modify metadata.",
+     "description": "Specifies a fingerprint for this request, which is essentially a hash of the metadata's contents and used for optimistic locking. The fingerprint is initially generated by Compute Engine and changes after every request to modify or update metadata. You must always provide an up-to-date fingerprint hash in order to update or change metadata.",
      "format": "byte"
     },
     "items": {
@@ -2353,7 +2350,7 @@
     },
     "kind": {
      "type": "string",
-     "description": "Type of the resource.",
+     "description": "[Output Only] Type of the resource. Always compute#metadata for metadata.",
      "default": "compute#metadata"
     }
    }
@@ -2419,18 +2416,18 @@
    "properties": {
     "accessConfigs": {
      "type": "array",
-     "description": "Array of configurations for this interface. This specifies how this interface is configured to interact with other network services, such as connecting to the internet. Currently, ONE_TO_ONE_NAT is the only access config supported. If there are no accessConfigs specified, then this instance will have no external internet access.",
+     "description": "An array of configurations for this interface. Currently, \u003ccodeONE_TO_ONE_NAT is the only access config supported. If there are no accessConfigs specified, then this instance will have no external internet access.",
      "items": {
       "$ref": "AccessConfig"
      }
     },
     "name": {
      "type": "string",
-     "description": "Name of the network interface, determined by the server; for network devices, these are e.g. eth0, eth1, etc. (output only)."
+     "description": "[Output Only] The name of the network interface, generated by the server. For network devices, these are eth0, eth1, etc."
     },
     "network": {
      "type": "string",
-     "description": "URL of the network resource attached to this interface.",
+     "description": "URL of the network resource for this instance. This is required for creating an instance but optional when creating a firewall rule. If not specified when creating a firewall rule, the default network is used:\n\nglobal/networks/default \n\nIf you specify this property, you can specify the network as a full or partial URL. For example, the following are all valid URLs:  \n- https://www.googleapis.com/compute/v1/projects/project/global/networks/network \n- projects/project/global/networks/network \n- global/networks/default",
      "annotations": {
       "required": [
        "compute.instances.insert"
@@ -2439,7 +2436,7 @@
     },
     "networkIP": {
      "type": "string",
-     "description": "An optional IPV4 internal network address assigned to the instance for this network interface (output only)."
+     "description": "[Output Only] An optional IPV4 internal network address assigned to the instance for this network interface."
     }
    }
   },
@@ -2454,7 +2451,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The network resources.",
+     "description": "A list of Network resources.",
      "items": {
       "$ref": "Network"
      }
@@ -2481,37 +2478,37 @@
    "properties": {
     "clientOperationId": {
      "type": "string",
-     "description": "An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project (output only)."
+     "description": "[Output Only] An optional identifier specified by the client when the mutation was initiated. Must be unique for all operation resources in the project"
     },
     "creationTimestamp": {
      "type": "string",
-     "description": "Creation timestamp in RFC3339 text format (output only)."
+     "description": "[Output Only] Creation timestamp in RFC3339 text format."
     },
     "endTime": {
      "type": "string",
-     "description": "The time that this operation was completed. This is in RFC 3339 format (output only)."
+     "description": "[Output Only] The time that this operation was completed. This is in RFC3339 text format."
     },
     "error": {
      "type": "object",
-     "description": "If errors occurred during processing of this operation, this field will be populated (output only).",
+     "description": "[Output Only] If errors are generated during processing of the operation, this field will be populated.",
      "properties": {
       "errors": {
        "type": "array",
-       "description": "The array of errors encountered while processing this operation.",
+       "description": "[Output Only] The array of errors encountered while processing this operation.",
        "items": {
         "type": "object",
         "properties": {
          "code": {
           "type": "string",
-          "description": "The error type identifier for this error."
+          "description": "[Output Only] The error type identifier for this error."
          },
          "location": {
           "type": "string",
-          "description": "Indicates the field in the request which caused the error. This property is optional."
+          "description": "[Output Only] Indicates the field in the request which caused the error. This property is optional."
          },
          "message": {
           "type": "string",
-          "description": "An optional, human-readable error message."
+          "description": "[Output Only] An optional, human-readable error message."
          }
         }
        }
@@ -2520,55 +2517,55 @@
     },
     "httpErrorMessage": {
      "type": "string",
-     "description": "If operation fails, the HTTP error message returned, e.g. NOT FOUND. (output only)."
+     "description": "[Output Only] If the operation fails, this field contains the HTTP error message that was returned, such as NOT FOUND."
     },
     "httpErrorStatusCode": {
      "type": "integer",
-     "description": "If operation fails, the HTTP error status code returned, e.g. 404. (output only).",
+     "description": "[Output Only] If the operation fails, this field contains the HTTP error message that was returned, such as 404.",
      "format": "int32"
     },
     "id": {
      "type": "string",
-     "description": "Unique identifier for the resource; defined by the server (output only).",
+     "description": "[Output Only] Unique identifier for the resource; defined by the server.",
      "format": "uint64"
     },
     "insertTime": {
      "type": "string",
-     "description": "The time that this operation was requested. This is in RFC 3339 format (output only)."
+     "description": "[Output Only] The time that this operation was requested. This is in RFC3339 text format."
     },
     "kind": {
      "type": "string",
-     "description": "Type of the resource.",
+     "description": "[Output Only] Type of the resource. Always compute#Operation for Operation resources.",
      "default": "compute#operation"
     },
     "name": {
      "type": "string",
-     "description": "Name of the resource (output only)."
+     "description": "[Output Only] Name of the resource."
     },
     "operationType": {
      "type": "string",
-     "description": "Type of the operation. Examples include \"insert\", \"update\", and \"delete\" (output only)."
+     "description": "[Output Only] Type of the operation, such as insert, update, and delete."
     },
     "progress": {
      "type": "integer",
-     "description": "An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses (output only).",
+     "description": "[Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess at when the operation will be complete. This number should be monotonically increasing as the operation progresses.",
      "format": "int32"
     },
     "region": {
      "type": "string",
-     "description": "URL of the region where the operation resides (output only)."
+     "description": "[Output Only] URL of the region where the operation resides. Only applicable for regional resources."
     },
     "selfLink": {
      "type": "string",
-     "description": "Server defined URL for the resource (output only)."
+     "description": "[Output Only] Server defined URL for the resource."
     },
     "startTime": {
      "type": "string",
-     "description": "The time that this operation was started by the server. This is in RFC 3339 format (output only)."
+     "description": "[Output Only] The time that this operation was started by the server. This is in RFC3339 text format."
     },
     "status": {
      "type": "string",
-     "description": "Status of the operation. Can be one of the following: \"PENDING\", \"RUNNING\", or \"DONE\" (output only).",
+     "description": "[Output Only] Status of the operation. Can be one of the following: PENDING, RUNNING, or DONE.",
      "enum": [
       "DONE",
       "PENDING",
@@ -2582,30 +2579,30 @@
     },
     "statusMessage": {
      "type": "string",
-     "description": "An optional textual description of the current status of the operation (output only)."
+     "description": "[Output Only] An optional textual description of the current status of the operation."
     },
     "targetId": {
      "type": "string",
-     "description": "Unique target id which identifies a particular incarnation of the target (output only).",
+     "description": "[Output Only] Unique target ID which identifies a particular incarnation of the target.",
      "format": "uint64"
     },
     "targetLink": {
      "type": "string",
-     "description": "URL of the resource the operation is mutating (output only)."
+     "description": "[Output Only] URL of the resource the operation is mutating."
     },
     "user": {
      "type": "string",
-     "description": "User who requested the operation, for example \"user@example.com\" (output only)."
+     "description": "[Output Only] User who requested the operation, for example: user@example.com."
     },
     "warnings": {
      "type": "array",
-     "description": "If warning messages generated during processing of this operation, this field will be populated (output only).",
+     "description": "[Output Only] If warning messages are generated during processing of the operation, this field will be populated.",
      "items": {
       "type": "object",
       "properties": {
        "code": {
         "type": "string",
-        "description": "The warning type identifier for this warning.",
+        "description": "[Output Only] The warning type identifier for this warning.",
         "enum": [
          "DEPRECATED_RESOURCE_USED",
          "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -2637,31 +2634,31 @@
        },
        "data": {
         "type": "array",
-        "description": "Metadata for this warning in 'key: value' format.",
+        "description": "[Output Only] Metadata for this warning in key: value format.",
         "items": {
          "type": "object",
          "properties": {
           "key": {
            "type": "string",
-           "description": "A key for the warning data."
+           "description": "[Output Only] A key for the warning data."
           },
           "value": {
            "type": "string",
-           "description": "A warning data value corresponding to the key."
+           "description": "[Output Only] A warning data value corresponding to the key."
           }
          }
         }
        },
        "message": {
         "type": "string",
-        "description": "Optional human-readable details for this warning."
+        "description": "[Output Only] Optional human-readable details for this warning."
        }
       }
      }
     },
     "zone": {
      "type": "string",
-     "description": "URL of the zone where the operation resides (output only)."
+     "description": "[Output Only] URL of the zone where the operation resides."
     }
    }
   },
@@ -2671,28 +2668,28 @@
    "properties": {
     "id": {
      "type": "string",
-     "description": "Unique identifier for the resource; defined by the server (output only)."
+     "description": "[Output Only] Unique identifier for the resource; defined by the server."
     },
     "items": {
      "type": "object",
-     "description": "A map of scoped operation lists.",
+     "description": "[Output Only] A map of scoped operation lists.",
      "additionalProperties": {
       "$ref": "OperationsScopedList",
-      "description": "Name of the scope containing this set of operations."
+      "description": "[Output Only] Name of the scope containing this set of operations."
      }
     },
     "kind": {
      "type": "string",
-     "description": "Type of resource.",
+     "description": "[Output Only] Type of resource. Always compute#operationAggregatedList for aggregated lists of operations.",
      "default": "compute#operationAggregatedList"
     },
     "nextPageToken": {
      "type": "string",
-     "description": "A token used to continue a truncated list request (output only)."
+     "description": "[Output Only] A token used to continue a truncated list request."
     },
     "selfLink": {
      "type": "string",
-     "description": "Server defined URL for this resource (output only)."
+     "description": "[Output Only] Server defined URL for this resource."
     }
    }
   },
@@ -2703,27 +2700,27 @@
    "properties": {
     "id": {
      "type": "string",
-     "description": "Unique identifier for the resource; defined by the server (output only)."
+     "description": "[Output Only] Unique identifier for the resource; defined by the server."
     },
     "items": {
      "type": "array",
-     "description": "The operation resources.",
+     "description": "[Output Only] The operation resources.",
      "items": {
       "$ref": "Operation"
      }
     },
     "kind": {
      "type": "string",
-     "description": "Type of resource.",
+     "description": "[Output Only] Type of resource. Always compute#operations for Operations resource.",
      "default": "compute#operationList"
     },
     "nextPageToken": {
      "type": "string",
-     "description": "A token used to continue a truncated list request (output only)."
+     "description": "[Output Only] A token used to continue a truncate."
     },
     "selfLink": {
      "type": "string",
-     "description": "Server defined URL for this resource (output only)."
+     "description": "[Output Only] Server defined URL for this resource."
     }
    }
   },
@@ -2733,18 +2730,18 @@
    "properties": {
     "operations": {
      "type": "array",
-     "description": "List of operations contained in this scope.",
+     "description": "[Output Only] List of operations contained in this scope.",
      "items": {
       "$ref": "Operation"
      }
     },
     "warning": {
      "type": "object",
-     "description": "Informational warning which replaces the list of operations when the list is empty.",
+     "description": "[Output Only] Informational warning which replaces the list of operations when the list is empty.",
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -2776,24 +2773,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -2897,12 +2894,12 @@
    "properties": {
     "limit": {
      "type": "number",
-     "description": "Quota limit for this metric.",
+     "description": "[Output Only] Quota limit for this metric.",
      "format": "double"
     },
     "metric": {
      "type": "string",
-     "description": "Name of the quota metric.",
+     "description": "[Output Only] Name of the quota metric.",
      "enum": [
       "BACKEND_SERVICES",
       "CPUS",
@@ -2960,7 +2957,7 @@
     },
     "usage": {
      "type": "number",
-     "description": "Current usage of this metric.",
+     "description": "[Output Only] Current usage of this metric.",
      "format": "double"
     }
    }
@@ -3039,7 +3036,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The region resources.",
+     "description": "A list of Region resources.",
      "items": {
       "$ref": "Region"
      }
@@ -3170,7 +3167,7 @@
       "properties": {
        "code": {
         "type": "string",
-        "description": "The warning type identifier for this warning.",
+        "description": "[Output Only] The warning type identifier for this warning.",
         "enum": [
          "DEPRECATED_RESOURCE_USED",
          "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -3202,24 +3199,24 @@
        },
        "data": {
         "type": "array",
-        "description": "Metadata for this warning in 'key: value' format.",
+        "description": "[Output Only] Metadata for this warning in key: value format.",
         "items": {
          "type": "object",
          "properties": {
           "key": {
            "type": "string",
-           "description": "A key for the warning data."
+           "description": "[Output Only] A key for the warning data."
           },
           "value": {
            "type": "string",
-           "description": "A warning data value corresponding to the key."
+           "description": "[Output Only] A warning data value corresponding to the key."
           }
          }
         }
        },
        "message": {
         "type": "string",
-        "description": "Optional human-readable details for this warning."
+        "description": "[Output Only] Optional human-readable details for this warning."
        }
       }
      }
@@ -3237,7 +3234,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The route resources.",
+     "description": "A list of Route resources.",
      "items": {
       "$ref": "Route"
      }
@@ -3260,15 +3257,15 @@
   "Scheduling": {
    "id": "Scheduling",
    "type": "object",
-   "description": "Scheduling options for an Instance.",
+   "description": "Sets the scheduling options for an Instance.",
    "properties": {
     "automaticRestart": {
      "type": "boolean",
-     "description": "Whether the Instance should be automatically restarted whenever it is terminated by Compute Engine (not terminated by user)."
+     "description": "Specifies whether the instance should be automatically restarted if it is terminated by Compute Engine (not terminated by a user)."
     },
     "onHostMaintenance": {
      "type": "string",
-     "description": "How the instance should behave when the host machine undergoes maintenance that may temporarily impact instance performance.",
+     "description": "Defines the maintenance behavior for this instance. The default behavior is MIGRATE. For more information, see Setting maintenance behavior.",
      "enum": [
       "MIGRATE",
       "TERMINATE"
@@ -3283,20 +3280,20 @@
   "SerialPortOutput": {
    "id": "SerialPortOutput",
    "type": "object",
-   "description": "An instance serial console output.",
+   "description": "An instance's serial console output.",
    "properties": {
     "contents": {
      "type": "string",
-     "description": "The contents of the console output."
+     "description": "[Output Only] The contents of the console output."
     },
     "kind": {
      "type": "string",
-     "description": "Type of the resource.",
+     "description": "[Output Only] Type of the resource. Always compute#serialPortOutput for serial port output.",
      "default": "compute#serialPortOutput"
     },
     "selfLink": {
      "type": "string",
-     "description": "Server defined URL for the resource (output only)."
+     "description": "[Output Only] Server defined URL for the resource."
     }
    }
   },
@@ -3418,7 +3415,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The persistent snapshot resources.",
+     "description": "A list of Snapshot resources.",
      "items": {
       "$ref": "Snapshot"
      }
@@ -3445,7 +3442,7 @@
    "properties": {
     "fingerprint": {
      "type": "string",
-     "description": "Fingerprint of this resource. A hash of the tags stored in this object. This field is used optimistic locking. An up-to-date tags fingerprint must be provided in order to modify tags.",
+     "description": "Specifies a fingerprint for this request, which is essentially a hash of the metadata's contents and used for optimistic locking. The fingerprint is initially generated by Compute Engine and changes after every request to modify or update metadata. You must always provide an up-to-date fingerprint hash in order to update or change metadata.\n\nTo see the latest fingerprint, make get() request to the instance.",
      "format": "byte"
     },
     "items": {
@@ -3506,7 +3503,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The TargetHttpProxy resources.",
+     "description": "A list of TargetHttpProxy resources.",
      "items": {
       "$ref": "TargetHttpProxy"
      }
@@ -3620,7 +3617,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The TargetInstance resources.",
+     "description": "A list of TargetInstance resources.",
      "items": {
       "$ref": "TargetInstance"
      }
@@ -3657,7 +3654,7 @@
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -3689,24 +3686,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -3846,7 +3843,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The TargetPool resources.",
+     "description": "A list of TargetPool resources.",
      "items": {
       "$ref": "TargetPool"
      }
@@ -3935,7 +3932,7 @@
      "properties": {
       "code": {
        "type": "string",
-       "description": "The warning type identifier for this warning.",
+       "description": "[Output Only] The warning type identifier for this warning.",
        "enum": [
         "DEPRECATED_RESOURCE_USED",
         "DISK_SIZE_LARGER_THAN_IMAGE_SIZE",
@@ -3967,24 +3964,24 @@
       },
       "data": {
        "type": "array",
-       "description": "Metadata for this warning in 'key: value' format.",
+       "description": "[Output Only] Metadata for this warning in key: value format.",
        "items": {
         "type": "object",
         "properties": {
          "key": {
           "type": "string",
-          "description": "A key for the warning data."
+          "description": "[Output Only] A key for the warning data."
          },
          "value": {
           "type": "string",
-          "description": "A warning data value corresponding to the key."
+          "description": "[Output Only] A warning data value corresponding to the key."
          }
         }
        }
       },
       "message": {
        "type": "string",
-       "description": "Optional human-readable details for this warning."
+       "description": "[Output Only] Optional human-readable details for this warning."
       }
      }
     }
@@ -4092,7 +4089,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The UrlMap resources.",
+     "description": "A list of UrlMap resources.",
      "items": {
       "$ref": "UrlMap"
      }
@@ -4294,7 +4291,7 @@
     },
     "items": {
      "type": "array",
-     "description": "The zone resources.",
+     "description": "A list of Zone resources.",
      "items": {
       "$ref": "Zone"
      }
@@ -4358,6 +4355,7 @@
       "$ref": "AddressAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4399,6 +4397,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -4439,6 +4438,7 @@
       "$ref": "Address"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4475,6 +4475,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -4526,6 +4527,7 @@
       "$ref": "AddressList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4563,6 +4565,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -4595,6 +4598,7 @@
       "$ref": "BackendService"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4630,6 +4634,7 @@
       "$ref": "BackendServiceGroupHealth"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4658,6 +4663,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -4701,6 +4707,7 @@
       "$ref": "BackendServiceList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4737,6 +4744,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -4772,6 +4780,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -4819,6 +4828,7 @@
       "$ref": "DiskTypeAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4860,6 +4870,7 @@
       "$ref": "DiskType"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4912,6 +4923,7 @@
       "$ref": "DiskTypeList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -4960,6 +4972,7 @@
       "$ref": "DiskAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5003,6 +5016,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5043,6 +5057,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5083,6 +5098,7 @@
       "$ref": "Disk"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5124,6 +5140,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5175,6 +5192,7 @@
       "$ref": "DiskList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5212,6 +5230,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5244,6 +5263,7 @@
       "$ref": "Firewall"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5272,6 +5292,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5315,6 +5336,7 @@
       "$ref": "FirewallList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5351,6 +5373,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5386,6 +5409,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -5433,6 +5457,7 @@
       "$ref": "ForwardingRuleAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5474,6 +5499,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5514,6 +5540,7 @@
       "$ref": "ForwardingRule"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5550,6 +5577,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5601,6 +5629,7 @@
       "$ref": "ForwardingRuleList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5645,6 +5674,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -5681,6 +5711,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5713,6 +5744,7 @@
       "$ref": "Address"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5741,6 +5773,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5784,6 +5817,7 @@
       "$ref": "AddressList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5821,6 +5855,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5853,6 +5888,7 @@
       "$ref": "ForwardingRule"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5881,6 +5917,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -5924,6 +5961,7 @@
       "$ref": "ForwardingRuleList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -5960,6 +5998,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -5994,7 +6033,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -6007,6 +6046,7 @@
       "$ref": "OperationAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6026,7 +6066,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -6037,6 +6077,7 @@
       "operation"
      ],
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6055,7 +6096,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -6069,6 +6110,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6100,7 +6142,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -6113,6 +6155,7 @@
       "$ref": "OperationList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6150,6 +6193,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6182,6 +6226,7 @@
       "$ref": "HttpHealthCheck"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6210,6 +6255,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6253,6 +6299,7 @@
       "$ref": "HttpHealthCheckList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6289,6 +6336,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6324,6 +6372,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -6360,6 +6409,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6395,6 +6445,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6427,6 +6478,7 @@
       "$ref": "Image"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6455,6 +6507,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/devstorage.full_control",
       "https://www.googleapis.com/auth/devstorage.read_only",
@@ -6501,6 +6554,7 @@
       "$ref": "ImageList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6538,6 +6592,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6570,6 +6625,7 @@
       "$ref": "InstanceTemplate"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6598,6 +6654,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6641,6 +6698,7 @@
       "$ref": "InstanceTemplateList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6657,27 +6715,27 @@
      "parameters": {
       "instance": {
        "type": "string",
-       "description": "Instance name.",
+       "description": "The instance name for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
       },
       "networkInterface": {
        "type": "string",
-       "description": "Network interface name.",
+       "description": "The name of the network interface to add to this instance.",
        "required": true,
        "location": "query"
       },
       "project": {
        "type": "string",
-       "description": "Project name.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -6696,6 +6754,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6725,7 +6784,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -6738,6 +6797,7 @@
       "$ref": "InstanceAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6746,7 +6806,7 @@
      "id": "compute.instances.attachDisk",
      "path": "{project}/zones/{zone}/instances/{instance}/attachDisk",
      "httpMethod": "POST",
-     "description": "Attaches a disk resource to an instance.",
+     "description": "Attaches a Disk resource to an instance.",
      "parameters": {
       "instance": {
        "type": "string",
@@ -6757,14 +6817,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Project name.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -6782,6 +6842,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6789,7 +6850,7 @@
      "id": "compute.instances.delete",
      "path": "{project}/zones/{zone}/instances/{instance}",
      "httpMethod": "DELETE",
-     "description": "Deletes the specified instance resource.",
+     "description": "Deletes the specified Instance resource. For more information, see Shutting down an instance.",
      "parameters": {
       "instance": {
        "type": "string",
@@ -6800,14 +6861,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -6822,6 +6883,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6833,33 +6895,33 @@
      "parameters": {
       "accessConfig": {
        "type": "string",
-       "description": "Access config name.",
+       "description": "The name of the access config to delete.",
        "required": true,
        "location": "query"
       },
       "instance": {
        "type": "string",
-       "description": "Instance name.",
+       "description": "The instance name for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
       },
       "networkInterface": {
        "type": "string",
-       "description": "Network interface name.",
+       "description": "The name of the network interface.",
        "required": true,
        "location": "query"
       },
       "project": {
        "type": "string",
-       "description": "Project name.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -6876,6 +6938,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6901,14 +6964,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Project name.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -6924,6 +6987,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -6942,14 +7006,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the The name of the zone for this request..",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -6964,6 +7028,7 @@
       "$ref": "Instance"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -6983,14 +7048,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -7005,6 +7070,7 @@
       "$ref": "SerialPortOutput"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7017,14 +7083,14 @@
      "parameters": {
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -7041,6 +7107,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7071,14 +7138,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -7092,6 +7159,7 @@
       "$ref": "InstanceList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7111,14 +7179,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -7133,6 +7201,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7140,7 +7209,7 @@
      "id": "compute.instances.setDiskAutoDelete",
      "path": "{project}/zones/{zone}/instances/{instance}/setDiskAutoDelete",
      "httpMethod": "POST",
-     "description": "Sets the auto-delete flag for a disk attached to an instance",
+     "description": "Sets the auto-delete flag for a disk attached to an instance.",
      "parameters": {
       "autoDelete": {
        "type": "boolean",
@@ -7150,28 +7219,28 @@
       },
       "deviceName": {
        "type": "string",
-       "description": "Disk device name to modify.",
+       "description": "The device name of the disk to modify.",
        "required": true,
        "pattern": "\\w[\\w.-]{0,254}",
        "location": "query"
       },
       "instance": {
        "type": "string",
-       "description": "Instance name.",
+       "description": "The instance name.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
       },
       "project": {
        "type": "string",
-       "description": "Project name.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -7188,6 +7257,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7206,14 +7276,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -7231,6 +7301,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7249,14 +7320,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Project name.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -7274,6 +7345,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7292,14 +7364,14 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
       },
       "zone": {
        "type": "string",
-       "description": "Name of the zone scoping this request.",
+       "description": "The name of the zone for this request.",
        "required": true,
        "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
        "location": "path"
@@ -7317,6 +7389,89 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/compute"
+     ]
+    },
+    "start": {
+     "id": "compute.instances.start",
+     "path": "{project}/zones/{zone}/instances/{instance}/start",
+     "httpMethod": "POST",
+     "description": "This method starts an instance that was stopped using the using the instances().stop method. For more information, see Restart an instance.",
+     "parameters": {
+      "instance": {
+       "type": "string",
+       "description": "Name of the instance resource to start.",
+       "required": true,
+       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+       "location": "path"
+      },
+      "project": {
+       "type": "string",
+       "description": "Project ID for this request.",
+       "required": true,
+       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+       "location": "path"
+      },
+      "zone": {
+       "type": "string",
+       "description": "The name of the zone for this request.",
+       "required": true,
+       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+       "location": "path"
+      }
+     },
+     "parameterOrder": [
+      "project",
+      "zone",
+      "instance"
+     ],
+     "response": {
+      "$ref": "Operation"
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
+      "https://www.googleapis.com/auth/compute"
+     ]
+    },
+    "stop": {
+     "id": "compute.instances.stop",
+     "path": "{project}/zones/{zone}/instances/{instance}/stop",
+     "httpMethod": "POST",
+     "description": "This method stops a running instance, shutting it down cleanly, and allows you to restart the instance at a later time. Stopped instances do not incur per-minute, virtual machine usage charges while they are stopped, but any resources that the virtual machine is using, such as persistent disks and static IP addresses,will continue to be charged until they are deleted. For more information, see Stopping an instance.",
+     "parameters": {
+      "instance": {
+       "type": "string",
+       "description": "Name of the instance resource to start.",
+       "required": true,
+       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+       "location": "path"
+      },
+      "project": {
+       "type": "string",
+       "description": "Project ID for this request.",
+       "required": true,
+       "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
+       "location": "path"
+      },
+      "zone": {
+       "type": "string",
+       "description": "The name of the zone for this request.",
+       "required": true,
+       "pattern": "[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?",
+       "location": "path"
+      }
+     },
+     "parameterOrder": [
+      "project",
+      "zone",
+      "instance"
+     ],
+     "response": {
+      "$ref": "Operation"
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -7353,6 +7508,7 @@
       "$ref": "License"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7388,7 +7544,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -7401,6 +7557,7 @@
       "$ref": "MachineTypeAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7420,7 +7577,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -7442,6 +7599,7 @@
       "$ref": "MachineType"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7473,7 +7631,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -7494,6 +7652,7 @@
       "$ref": "MachineTypeList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7531,6 +7690,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7563,6 +7723,7 @@
       "$ref": "Network"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7591,6 +7752,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7634,6 +7796,7 @@
       "$ref": "NetworkList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7663,6 +7826,7 @@
       "$ref": "Project"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7691,6 +7855,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7718,6 +7883,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/devstorage.full_control",
       "https://www.googleapis.com/auth/devstorage.read_only",
@@ -7743,7 +7909,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -7762,6 +7928,7 @@
       "operation"
      ],
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -7780,7 +7947,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -7802,6 +7969,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7833,7 +8001,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -7854,6 +8022,7 @@
       "$ref": "OperationList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7891,6 +8060,7 @@
       "$ref": "Region"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7935,6 +8105,7 @@
       "$ref": "RegionList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -7972,6 +8143,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8004,6 +8176,7 @@
       "$ref": "Route"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8032,6 +8205,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8075,6 +8249,7 @@
       "$ref": "RouteList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8112,6 +8287,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8144,6 +8320,7 @@
       "$ref": "Snapshot"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8188,6 +8365,7 @@
       "$ref": "SnapshotList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8225,6 +8403,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8257,6 +8436,7 @@
       "$ref": "TargetHttpProxy"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8285,6 +8465,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8328,6 +8509,7 @@
       "$ref": "TargetHttpProxyList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8364,6 +8546,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -8411,6 +8594,7 @@
       "$ref": "TargetInstanceAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8452,6 +8636,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8492,6 +8677,7 @@
       "$ref": "TargetInstance"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8528,6 +8714,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8579,6 +8766,7 @@
       "$ref": "TargetInstanceList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8626,6 +8814,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8668,6 +8857,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8711,6 +8901,7 @@
       "$ref": "TargetPoolAggregatedList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8752,6 +8943,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8792,6 +8984,7 @@
       "$ref": "TargetPool"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8835,6 +9028,7 @@
       "$ref": "TargetPoolInstanceHealth"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8871,6 +9065,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -8922,6 +9117,7 @@
       "$ref": "TargetPoolList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -8965,6 +9161,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -9007,6 +9204,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -9056,6 +9254,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -9092,6 +9291,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -9124,6 +9324,7 @@
       "$ref": "UrlMap"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -9152,6 +9353,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -9195,6 +9397,7 @@
       "$ref": "UrlMapList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -9231,6 +9434,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -9266,6 +9470,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -9301,6 +9506,7 @@
       "$ref": "UrlMapsValidateResponse"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     }
@@ -9323,7 +9529,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -9342,6 +9548,7 @@
       "operation"
      ],
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute"
      ]
     },
@@ -9360,7 +9567,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -9382,6 +9589,7 @@
       "$ref": "Operation"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -9413,7 +9621,7 @@
       },
       "project": {
        "type": "string",
-       "description": "Name of the project scoping this request.",
+       "description": "Project ID for this request.",
        "required": true,
        "pattern": "(?:(?:[-a-z0-9]{1,63}\\.)*(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?):)?(?:[0-9]{1,19}|(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?))",
        "location": "path"
@@ -9434,6 +9642,7 @@
       "$ref": "OperationList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -9471,6 +9680,7 @@
       "$ref": "Zone"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]
@@ -9515,6 +9725,7 @@
       "$ref": "ZoneList"
      },
      "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform",
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/compute.readonly"
      ]

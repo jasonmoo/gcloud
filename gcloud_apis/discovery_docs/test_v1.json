@@ -1,0 +1,1148 @@
+{
+ "kind": "discovery#restDescription",
+ "discoveryVersion": "v1",
+ "id": "test:v1",
+ "name": "test",
+ "version": "v1",
+ "revision": "20150212",
+ "title": "Google Cloud Test API",
+ "description": "The Test API allows developers to run automated tests for their applications on Google infrastructure.",
+ "ownerDomain": "google.com",
+ "ownerName": "Google",
+ "icons": {
+  "x16": "http://www.google.com/images/icons/product/search-16.gif",
+  "x32": "http://www.google.com/images/icons/product/search-32.gif"
+ },
+ "documentationLink": "",
+ "protocol": "rest",
+ "baseUrl": "https://test-devtools.googleapis.com/v1/",
+ "basePath": "/v1/",
+ "rootUrl": "https://test-devtools.googleapis.com/",
+ "servicePath": "v1/",
+ "batchPath": "batch",
+ "parameters": {
+  "alt": {
+   "type": "string",
+   "description": "Data format for the response.",
+   "default": "json",
+   "enum": [
+    "json"
+   ],
+   "enumDescriptions": [
+    "Responses with Content-Type of application/json"
+   ],
+   "location": "query"
+  },
+  "fields": {
+   "type": "string",
+   "description": "Selector specifying which fields to include in a partial response.",
+   "location": "query"
+  },
+  "key": {
+   "type": "string",
+   "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+   "location": "query"
+  },
+  "oauth_token": {
+   "type": "string",
+   "description": "OAuth 2.0 token for the current user.",
+   "location": "query"
+  },
+  "prettyPrint": {
+   "type": "boolean",
+   "description": "Returns response with indentations and line breaks.",
+   "default": "true",
+   "location": "query"
+  },
+  "quotaUser": {
+   "type": "string",
+   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "location": "query"
+  },
+  "userIp": {
+   "type": "string",
+   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "location": "query"
+  }
+ },
+ "auth": {
+  "oauth2": {
+   "scopes": {
+    "https://www.googleapis.com/auth/cloud-platform": {
+     "description": "View and manage your data across Google Cloud Platform services"
+    }
+   }
+  }
+ },
+ "schemas": {
+  "AndroidDevice": {
+   "id": "AndroidDevice",
+   "type": "object",
+   "properties": {
+    "androidModelId": {
+     "type": "string"
+    },
+    "androidVersionId": {
+     "type": "string"
+    },
+    "locale": {
+     "type": "string"
+    },
+    "orientation": {
+     "type": "string"
+    }
+   }
+  },
+  "AndroidDeviceCatalog": {
+   "id": "AndroidDeviceCatalog",
+   "type": "object",
+   "properties": {
+    "models": {
+     "type": "array",
+     "items": {
+      "$ref": "AndroidModel"
+     }
+    },
+    "runtimeConfiguration": {
+     "$ref": "AndroidRuntimeConfiguration"
+    },
+    "versions": {
+     "type": "array",
+     "items": {
+      "$ref": "AndroidVersion"
+     }
+    }
+   }
+  },
+  "AndroidInstrumentationTest": {
+   "id": "AndroidInstrumentationTest",
+   "type": "object",
+   "properties": {
+    "appApk": {
+     "$ref": "FileReference"
+    },
+    "appPackageId": {
+     "type": "string"
+    },
+    "testApk": {
+     "$ref": "FileReference"
+    },
+    "testPackageId": {
+     "type": "string"
+    },
+    "testRunnerClass": {
+     "type": "string"
+    },
+    "testTargets": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "AndroidMatrix": {
+   "id": "AndroidMatrix",
+   "type": "object",
+   "properties": {
+    "androidModelIds": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "androidVersionIds": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "locales": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    },
+    "orientations": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "AndroidModel": {
+   "id": "AndroidModel",
+   "type": "object",
+   "properties": {
+    "form": {
+     "type": "string",
+     "enum": [
+      "PHYSICAL",
+      "UNSPECIFIED",
+      "VIRTUAL"
+     ],
+     "enumDescriptions": [
+      "",
+      "",
+      ""
+     ]
+    },
+    "id": {
+     "type": "string"
+    },
+    "manufacturer": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "screenX": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "screenY": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "supportedVersionIds": {
+     "type": "array",
+     "items": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "AndroidMonkeyTest": {
+   "id": "AndroidMonkeyTest",
+   "type": "object",
+   "properties": {
+    "appApk": {
+     "$ref": "FileReference"
+    },
+    "appPackageId": {
+     "type": "string"
+    },
+    "eventCount": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "eventDelay": {
+     "type": "string"
+    },
+    "randomSeed": {
+     "type": "integer",
+     "format": "int32"
+    }
+   }
+  },
+  "AndroidRoboTest": {
+   "id": "AndroidRoboTest",
+   "type": "object",
+   "properties": {
+    "appApk": {
+     "$ref": "FileReference"
+    },
+    "appPackageId": {
+     "type": "string"
+    }
+   }
+  },
+  "AndroidRuntimeConfiguration": {
+   "id": "AndroidRuntimeConfiguration",
+   "type": "object",
+   "properties": {
+    "locales": {
+     "type": "array",
+     "items": {
+      "$ref": "Locale"
+     }
+    },
+    "orientations": {
+     "type": "array",
+     "items": {
+      "$ref": "Orientation"
+     }
+    }
+   }
+  },
+  "AndroidVersion": {
+   "id": "AndroidVersion",
+   "type": "object",
+   "properties": {
+    "apiLevel": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "codeName": {
+     "type": "string"
+    },
+    "distribution": {
+     "$ref": "Distribution"
+    },
+    "id": {
+     "type": "string"
+    },
+    "releaseDate": {
+     "type": "string"
+    },
+    "versionString": {
+     "type": "string"
+    }
+   }
+  },
+  "BlobstoreFile": {
+   "id": "BlobstoreFile",
+   "type": "object",
+   "properties": {
+    "blobId": {
+     "type": "string"
+    },
+    "md5Hash": {
+     "type": "string"
+    }
+   }
+  },
+  "CancelTestExecutionResponse": {
+   "id": "CancelTestExecutionResponse",
+   "type": "object",
+   "properties": {
+    "testState": {
+     "type": "string",
+     "enum": [
+      "ERROR",
+      "FINISHED",
+      "IN_PROGRESS",
+      "QUEUED",
+      "UNSPECIFIED_TEST_STATE"
+     ],
+     "enumDescriptions": [
+      "",
+      "",
+      "",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  "CancelTestMatrixResponse": {
+   "id": "CancelTestMatrixResponse",
+   "type": "object",
+   "properties": {
+    "testState": {
+     "type": "string",
+     "enum": [
+      "ERROR",
+      "FINISHED",
+      "IN_PROGRESS",
+      "QUEUED",
+      "UNSPECIFIED_TEST_STATE"
+     ],
+     "enumDescriptions": [
+      "",
+      "",
+      "",
+      "",
+      ""
+     ]
+    }
+   }
+  },
+  "ConnectionInfo": {
+   "id": "ConnectionInfo",
+   "type": "object",
+   "properties": {
+    "adbPort": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "ipAddress": {
+     "type": "string"
+    },
+    "sshPort": {
+     "type": "integer",
+     "format": "int32"
+    },
+    "vncPassword": {
+     "type": "string"
+    },
+    "vncPort": {
+     "type": "integer",
+     "format": "int32"
+    }
+   }
+  },
+  "Device": {
+   "id": "Device",
+   "type": "object",
+   "properties": {
+    "androidDevice": {
+     "$ref": "AndroidDevice"
+    },
+    "creationTime": {
+     "type": "string"
+    },
+    "deviceDetails": {
+     "$ref": "DeviceDetails"
+    },
+    "id": {
+     "type": "string"
+    },
+    "state": {
+     "type": "string",
+     "enum": [
+      "CLOSED",
+      "DEVICE_ERROR",
+      "DEVICE_UNSPECIFIED",
+      "PREPARING",
+      "READY"
+     ],
+     "enumDescriptions": [
+      "",
+      "",
+      "",
+      "",
+      ""
+     ]
+    },
+    "stateDetails": {
+     "$ref": "DeviceStateDetails"
+    }
+   }
+  },
+  "DeviceDetails": {
+   "id": "DeviceDetails",
+   "type": "object",
+   "properties": {
+    "connectionInfo": {
+     "$ref": "ConnectionInfo"
+    },
+    "gceInstanceDetails": {
+     "$ref": "GceInstanceDetails"
+    }
+   }
+  },
+  "DeviceStateDetails": {
+   "id": "DeviceStateDetails",
+   "type": "object",
+   "properties": {
+    "errorDetails": {
+     "type": "string"
+    },
+    "progressDetails": {
+     "type": "string"
+    }
+   }
+  },
+  "Distribution": {
+   "id": "Distribution",
+   "type": "object",
+   "properties": {
+    "marketShare": {
+     "type": "number",
+     "format": "double"
+    },
+    "measurementTime": {
+     "type": "string"
+    }
+   }
+  },
+  "Empty": {
+   "id": "Empty",
+   "type": "object"
+  },
+  "Environment": {
+   "id": "Environment",
+   "type": "object",
+   "properties": {
+    "androidDevice": {
+     "$ref": "AndroidDevice"
+    }
+   }
+  },
+  "EnvironmentMatrix": {
+   "id": "EnvironmentMatrix",
+   "type": "object",
+   "properties": {
+    "androidMatrix": {
+     "$ref": "AndroidMatrix"
+    }
+   }
+  },
+  "FileReference": {
+   "id": "FileReference",
+   "type": "object",
+   "properties": {
+    "blob": {
+     "$ref": "BlobstoreFile"
+    },
+    "gcsPath": {
+     "type": "string"
+    }
+   }
+  },
+  "GceInstanceDetails": {
+   "id": "GceInstanceDetails",
+   "type": "object",
+   "properties": {
+    "name": {
+     "type": "string"
+    },
+    "projectId": {
+     "type": "string"
+    },
+    "zone": {
+     "type": "string"
+    }
+   }
+  },
+  "GoogleCloudStorage": {
+   "id": "GoogleCloudStorage",
+   "type": "object",
+   "properties": {
+    "gcsPath": {
+     "type": "string"
+    }
+   }
+  },
+  "ListDevicesResponse": {
+   "id": "ListDevicesResponse",
+   "type": "object",
+   "properties": {
+    "devices": {
+     "type": "array",
+     "items": {
+      "$ref": "Device"
+     }
+    },
+    "nextPageToken": {
+     "type": "string"
+    }
+   }
+  },
+  "ListTestExecutionsResponse": {
+   "id": "ListTestExecutionsResponse",
+   "type": "object",
+   "properties": {
+    "testExecutions": {
+     "type": "array",
+     "items": {
+      "$ref": "TestExecution"
+     }
+    }
+   }
+  },
+  "ListTestMatricesResponse": {
+   "id": "ListTestMatricesResponse",
+   "type": "object",
+   "properties": {
+    "testMatrices": {
+     "type": "array",
+     "items": {
+      "$ref": "TestMatrix"
+     }
+    }
+   }
+  },
+  "Locale": {
+   "id": "Locale",
+   "type": "object",
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "region": {
+     "type": "string"
+    }
+   }
+  },
+  "Orientation": {
+   "id": "Orientation",
+   "type": "object",
+   "properties": {
+    "id": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    }
+   }
+  },
+  "ResultStorage": {
+   "id": "ResultStorage",
+   "type": "object",
+   "properties": {
+    "googleCloudStorage": {
+     "$ref": "GoogleCloudStorage"
+    },
+    "toolResultsExecutionId": {
+     "type": "string"
+    },
+    "toolResultsHistoryId": {
+     "type": "string"
+    },
+    "toolResultsStepId": {
+     "type": "string"
+    }
+   }
+  },
+  "TestDetails": {
+   "id": "TestDetails",
+   "type": "object",
+   "properties": {
+    "errorDetails": {
+     "type": "string"
+    },
+    "progressDetails": {
+     "type": "string"
+    }
+   }
+  },
+  "TestEnvironmentCatalog": {
+   "id": "TestEnvironmentCatalog",
+   "type": "object",
+   "properties": {
+    "androidDeviceCatalog": {
+     "$ref": "AndroidDeviceCatalog"
+    }
+   }
+  },
+  "TestExecution": {
+   "id": "TestExecution",
+   "type": "object",
+   "properties": {
+    "environment": {
+     "$ref": "Environment"
+    },
+    "id": {
+     "type": "string"
+    },
+    "labels": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "string"
+     }
+    },
+    "resultStorage": {
+     "$ref": "ResultStorage"
+    },
+    "state": {
+     "type": "string",
+     "enum": [
+      "ERROR",
+      "FINISHED",
+      "IN_PROGRESS",
+      "QUEUED",
+      "UNSPECIFIED_TEST_STATE"
+     ],
+     "enumDescriptions": [
+      "",
+      "",
+      "",
+      "",
+      ""
+     ]
+    },
+    "testDetails": {
+     "$ref": "TestDetails"
+    },
+    "testSpecification": {
+     "$ref": "TestSpecification"
+    },
+    "timestamp": {
+     "type": "string"
+    }
+   }
+  },
+  "TestMatrix": {
+   "id": "TestMatrix",
+   "type": "object",
+   "properties": {
+    "environmentMatrix": {
+     "$ref": "EnvironmentMatrix"
+    },
+    "labels": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "string"
+     }
+    },
+    "resultStorage": {
+     "$ref": "ResultStorage"
+    },
+    "testExecutions": {
+     "type": "array",
+     "items": {
+      "$ref": "TestExecution"
+     }
+    },
+    "testMatrixId": {
+     "type": "string"
+    },
+    "testSpecification": {
+     "$ref": "TestSpecification"
+    }
+   }
+  },
+  "TestSpecification": {
+   "id": "TestSpecification",
+   "type": "object",
+   "properties": {
+    "androidInstrumentationTest": {
+     "$ref": "AndroidInstrumentationTest"
+    },
+    "androidMonkeyTest": {
+     "$ref": "AndroidMonkeyTest"
+    },
+    "androidRoboTest": {
+     "$ref": "AndroidRoboTest"
+    },
+    "testTimeout": {
+     "type": "string"
+    }
+   }
+  }
+ },
+ "resources": {
+  "projects": {
+   "resources": {
+    "device": {
+     "methods": {
+      "delete": {
+       "id": "test.projects.device.delete",
+       "path": "projects/{projectId}/device/{deviceId}",
+       "httpMethod": "DELETE",
+       "description": "Deletes a GCE Android device instance. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the project does not exist",
+       "parameters": {
+        "deviceId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId",
+        "deviceId"
+       ],
+       "response": {
+        "$ref": "Empty"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      }
+     }
+    },
+    "devices": {
+     "methods": {
+      "create": {
+       "id": "test.projects.devices.create",
+       "path": "projects/{projectId}/devices",
+       "httpMethod": "POST",
+       "description": "Creates a new GCE Android device. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to write to project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the device type or project does not exist",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "request": {
+        "$ref": "Device"
+       },
+       "response": {
+        "$ref": "Device"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "get": {
+       "id": "test.projects.devices.get",
+       "path": "projects/{projectId}/devices/{deviceId}",
+       "httpMethod": "GET",
+       "description": "Returns the GCE Android device. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the device type or project does not exist",
+       "parameters": {
+        "deviceId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId",
+        "deviceId"
+       ],
+       "response": {
+        "$ref": "Device"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "list": {
+       "id": "test.projects.devices.list",
+       "path": "projects/{projectId}/devices",
+       "httpMethod": "GET",
+       "description": "Lists all the current devices. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the project does not exist",
+       "parameters": {
+        "pageSize": {
+         "type": "integer",
+         "format": "int32",
+         "location": "query"
+        },
+        "pageToken": {
+         "type": "string",
+         "location": "query"
+        },
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "response": {
+        "$ref": "ListDevicesResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      }
+     }
+    },
+    "testExecutions": {
+     "methods": {
+      "cancel": {
+       "id": "test.projects.testExecutions.cancel",
+       "path": "projects/{projectId}/testExecutions/{testExecutionId}:cancel",
+       "httpMethod": "POST",
+       "description": "Cancel an individual test execution. If the specified test execution is running it will be aborted. If it's pending then it will simply be removed from the queue. The cancelled test execution will still be visible in the results of ListTestExecutions and GetTestExecution. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Execution does not exist",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "testExecutionId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId",
+        "testExecutionId"
+       ],
+       "response": {
+        "$ref": "CancelTestExecutionResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "create": {
+       "id": "test.projects.testExecutions.create",
+       "path": "projects/{projectId}/testExecutions",
+       "httpMethod": "POST",
+       "description": "Request to execute a single test according to the given specification. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to write to project - INVALID_ARGUMENT - if the request is malformed - UNSUPPORTED - if the given test environment is not supported.",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "request": {
+        "$ref": "TestExecution"
+       },
+       "response": {
+        "$ref": "TestExecution"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "delete": {
+       "id": "test.projects.testExecutions.delete",
+       "path": "projects/{projectId}/testExecutions/{testExecutionId}",
+       "httpMethod": "DELETE",
+       "description": "Delete all record of an individual test execution. The test execution will first be canceled if it is running or queued. It will no longer appear in the response from ListTestExecutions or GetTestExecution. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Execution does not exist",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "testExecutionId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId",
+        "testExecutionId"
+       ],
+       "response": {
+        "$ref": "Empty"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "get": {
+       "id": "test.projects.testExecutions.get",
+       "path": "projects/{projectId}/testExecutions/{testExecutionId}",
+       "httpMethod": "GET",
+       "description": "Check the status of an individual test execution. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Execution does not exist",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "testExecutionId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId",
+        "testExecutionId"
+       ],
+       "response": {
+        "$ref": "TestExecution"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "list": {
+       "id": "test.projects.testExecutions.list",
+       "path": "projects/{projectId}/testExecutions",
+       "httpMethod": "GET",
+       "description": "List Test Executions The executions are sorted by creation_time in descending order. The test_execution_id key will be used to order the executions with the same creation_time. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "query": {
+         "type": "string",
+         "location": "query"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "response": {
+        "$ref": "ListTestExecutionsResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      }
+     }
+    },
+    "testMatrices": {
+     "methods": {
+      "cancel": {
+       "id": "test.projects.testMatrices.cancel",
+       "path": "projects/{projectId}/testMatrices/{testMatrixId}:cancel",
+       "httpMethod": "POST",
+       "description": "Cancel a test matrix. If the test executions associated with the matrix are running they will be aborted. If they're pending then they will simply be removed from the queue. The cancelled tests may still be queried via calls to List* and Get*. This is equivalent to calling CancelTestExecution once for each test execution in the matrix. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Matrix does not exist",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "testMatrixId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId",
+        "testMatrixId"
+       ],
+       "response": {
+        "$ref": "CancelTestMatrixResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "create": {
+       "id": "test.projects.testMatrices.create",
+       "path": "projects/{projectId}/testMatrices",
+       "httpMethod": "POST",
+       "description": "Request to run a matrix of tests according to the given specifications. Unsupported environments will be ignored. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to write to project - INVALID_ARGUMENT - if the request is malformed",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "request": {
+        "$ref": "TestMatrix"
+       },
+       "response": {
+        "$ref": "TestMatrix"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "delete": {
+       "id": "test.projects.testMatrices.delete",
+       "path": "projects/{projectId}/testMatrices/{testMatrixId}",
+       "httpMethod": "DELETE",
+       "description": "Delete all record of a test matrix plus any associated test executions. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Matrix does not exist",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "testMatrixId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId",
+        "testMatrixId"
+       ],
+       "response": {
+        "$ref": "Empty"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "get": {
+       "id": "test.projects.testMatrices.get",
+       "path": "projects/{projectId}/testMatrices/{testMatrixId}",
+       "httpMethod": "GET",
+       "description": "Check the status of a test matrix. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Matrix does not exist",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "testMatrixId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        }
+       },
+       "parameterOrder": [
+        "projectId",
+        "testMatrixId"
+       ],
+       "response": {
+        "$ref": "TestMatrix"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      },
+      "list": {
+       "id": "test.projects.testMatrices.list",
+       "path": "projects/{projectId}/testMatrices",
+       "httpMethod": "GET",
+       "description": "List test matrices. The returned matrices are currently unsorted. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed",
+       "parameters": {
+        "projectId": {
+         "type": "string",
+         "required": true,
+         "location": "path"
+        },
+        "query": {
+         "type": "string",
+         "location": "query"
+        }
+       },
+       "parameterOrder": [
+        "projectId"
+       ],
+       "response": {
+        "$ref": "ListTestMatricesResponse"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/cloud-platform"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "testEnvironmentCatalog": {
+   "methods": {
+    "get": {
+     "id": "test.testEnvironmentCatalog.get",
+     "path": "testEnvironmentCatalog/{environmentType}",
+     "httpMethod": "GET",
+     "description": "Get the catalog of supported test environments. May return any of the following canonical error codes: - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the environment type does not exist - INTERNAL - if an internal error occurred",
+     "parameters": {
+      "environmentType": {
+       "type": "string",
+       "required": true,
+       "enum": [
+        "ANDROID",
+        "UNSPECIFIED"
+       ],
+       "enumDescriptions": [
+        "",
+        ""
+       ],
+       "location": "path"
+      }
+     },
+     "parameterOrder": [
+      "environmentType"
+     ],
+     "response": {
+      "$ref": "TestEnvironmentCatalog"
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/cloud-platform"
+     ]
+    }
+   }
+  }
+ }
+}

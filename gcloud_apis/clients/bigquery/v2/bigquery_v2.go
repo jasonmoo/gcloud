@@ -311,6 +311,10 @@ type GetQueryResultsResponse struct {
 	// completes successfully.
 	Schema *TableSchema `json:"schema,omitempty"`
 
+	// TotalBytesProcessed: The total number of bytes processed for this
+	// query.
+	TotalBytesProcessed int64 `json:"totalBytesProcessed,omitempty,string"`
+
 	// TotalRows: The total number of rows in the complete query result set,
 	// which can be more than the number of rows in this single page of
 	// results. Present only when the query completes successfully.
@@ -345,6 +349,9 @@ type Job struct {
 	// Status: [Output-only] The status of this job. Examine this value when
 	// polling an asynchronous job to see if the job is complete.
 	Status *JobStatus `json:"status,omitempty"`
+
+	// User_email: [Output-only] Email address of the user who ran the job.
+	User_email string `json:"user_email,omitempty"`
 }
 
 type JobConfiguration struct {
@@ -483,6 +490,15 @@ type JobConfigurationLoad struct {
 	// result and the job fails. The default value is 0, which requires that
 	// all records are valid.
 	MaxBadRecords int64 `json:"maxBadRecords,omitempty"`
+
+	// ProjectionFields: [Experimental] Names(case-sensitive) of properties
+	// to keep when importing data. If this is populated, only the specified
+	// properties will be imported for each entity. Currently, this is only
+	// supported for DATASTORE_BACKUP imports and only top level properties
+	// are supported. If any specified property is not found in the
+	// Datastore 'Kind' being imported, that is an error. Note: This feature
+	// is experimental and can change in the future.
+	ProjectionFields []string `json:"projectionFields,omitempty"`
 
 	// Quote: [Optional] The value that is used to quote data sections in a
 	// CSV file. BigQuery converts the string to ISO-8859-1 encoding, and
@@ -675,7 +691,8 @@ type JobListJobs struct {
 	// Status: [Full-projection-only] Describes the state of the job.
 	Status *JobStatus `json:"status,omitempty"`
 
-	// User_email: [Full-projection-only] User who ran the job.
+	// User_email: [Full-projection-only] Email address of the user who ran
+	// the job.
 	User_email string `json:"user_email,omitempty"`
 }
 
@@ -698,6 +715,9 @@ type JobStatistics struct {
 	// the epoch. This field will be present whenever a job is in the DONE
 	// state.
 	EndTime int64 `json:"endTime,omitempty,string"`
+
+	// Extract: [Output-only] Statistics for an extract job.
+	Extract *JobStatistics4 `json:"extract,omitempty"`
 
 	// Load: [Output-only] Statistics for a load job.
 	Load *JobStatistics3 `json:"load,omitempty"`
@@ -742,6 +762,14 @@ type JobStatistics3 struct {
 	// that while an import job is in the running state, this value may
 	// change.
 	OutputRows int64 `json:"outputRows,omitempty,string"`
+}
+
+type JobStatistics4 struct {
+	// DestinationUriFileCounts: [Experimental] Number of files per
+	// destination URI or URI pattern specified in the extract
+	// configuration. These values will be in the same order as the URIs
+	// specified in the 'destinationUris' field.
+	DestinationUriFileCounts googleapi.Int64s `json:"destinationUriFileCounts,omitempty"`
 }
 
 type JobStatus struct {
@@ -807,10 +835,10 @@ type QueryRequest struct {
 	// format 'datasetId.tableId'.
 	DefaultDataset *DatasetReference `json:"defaultDataset,omitempty"`
 
-	// DryRun: [Optional] If set, don't actually run the query. A valid
-	// query will return an empty response, while an invalid query will
-	// return the same error it would if it wasn't a dry run. The default
-	// value is false.
+	// DryRun: [Optional] If set, don't actually run this job. A valid query
+	// will return a mostly empty response with some processing statistics,
+	// while an invalid query will return the same error it would if it
+	// wasn't a dry run.
 	DryRun bool `json:"dryRun,omitempty"`
 
 	// Kind: The resource type of the request.
@@ -918,7 +946,7 @@ type Table struct {
 
 	// LastModifiedTime: [Output-only] The time when this table was last
 	// modified, in milliseconds since the epoch.
-	LastModifiedTime int64 `json:"lastModifiedTime,omitempty,string"`
+	LastModifiedTime uint64 `json:"lastModifiedTime,omitempty,string"`
 
 	// NumBytes: [Output-only] The size of the table in bytes. This property
 	// is unavailable for tables that are actively receiving streaming

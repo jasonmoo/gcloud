@@ -5322,6 +5322,106 @@ func Compute_v1_InstancesSetTags(context Context, args ...string) error {
 	return nil
 }
 
+func Compute_v1_InstancesStart(context Context, args ...string) error {
+
+	usageFunc := func() {
+		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
+
+		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
+		os.Exit(1)
+	}
+
+	api_service, err := api_client.New(context.Client)
+	if err != nil {
+		return err
+	}
+	service := api_client.NewInstancesService(api_service)
+
+	// Only positional arguments should remain in args.
+	if len(args) != 1 {
+		usageFunc()
+	}
+
+	expectedParams := []string{
+		"project",
+		"zone",
+		"instance",
+	}
+	paramValues := strings.Split(args[0], "/")
+	if len(paramValues) != len(expectedParams) {
+		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
+	}
+
+	param_project := paramValues[0]
+	param_zone := paramValues[1]
+	param_instance := paramValues[2]
+
+	call := service.Start(param_project, param_zone, param_instance)
+
+	var response *api_client.Operation
+	response, err = call.Do()
+	if err != nil {
+		return err
+	}
+
+	err = commands_util.PrintResponse(response)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func Compute_v1_InstancesStop(context Context, args ...string) error {
+
+	usageFunc := func() {
+		usageBits := fmt.Sprintf("gcloud_apis %s", context.InvocationMethod)
+
+		fmt.Fprintf(os.Stderr, "Usage:\n\t%s\n", usageBits)
+		os.Exit(1)
+	}
+
+	api_service, err := api_client.New(context.Client)
+	if err != nil {
+		return err
+	}
+	service := api_client.NewInstancesService(api_service)
+
+	// Only positional arguments should remain in args.
+	if len(args) != 1 {
+		usageFunc()
+	}
+
+	expectedParams := []string{
+		"project",
+		"zone",
+		"instance",
+	}
+	paramValues := strings.Split(args[0], "/")
+	if len(paramValues) != len(expectedParams) {
+		return commands_util.ErrForWrongParams(expectedParams, paramValues, args)
+	}
+
+	param_project := paramValues[0]
+	param_zone := paramValues[1]
+	param_instance := paramValues[2]
+
+	call := service.Stop(param_project, param_zone, param_instance)
+
+	var response *api_client.Operation
+	response, err = call.Do()
+	if err != nil {
+		return err
+	}
+
+	err = commands_util.PrintResponse(response)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func Compute_v1_LicensesGet(context Context, args ...string) error {
 
 	usageFunc := func() {

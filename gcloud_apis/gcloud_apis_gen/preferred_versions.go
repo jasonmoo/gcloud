@@ -21,6 +21,7 @@ var preferredVersions = map[string]string{
 	"bigquery":           "v2",
 	"compute":            "v1",
 	"container":          "v1beta1",
+	"deploymentmanager":  "v2beta1",
 	"developerprojects":  "v1",
 	"dns":                "v1beta1",
 	"logging":            "v1beta",
@@ -30,4 +31,6 @@ var preferredVersions = map[string]string{
 	"resourceviews":      "v1beta1",
 	"source":             "v0",
 	"sqladmin":           "v1beta3",
+	"test":               "v1",
+	"toolresults":        "v1beta3",
 }

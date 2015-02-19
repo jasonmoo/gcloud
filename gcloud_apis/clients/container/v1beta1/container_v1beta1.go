@@ -1,5 +1,7 @@
 // Package container provides access to the Google Container Engine API.
 //
+// See https://cloud.google.com/container-engine/docs/v1beta1/
+//
 // Usage example:
 //
 //   import "google.golang.org/api/container/v1beta1"
@@ -130,8 +132,11 @@ type ProjectsZonesOperationsService struct {
 
 type Cluster struct {
 	// ClusterApiVersion: The API version of the Kubernetes master and
-	// kubelets running in this cluster. Allowed values are 0.4.1, 0.4.2, or
-	// leave blank.
+	// kubelets running in this cluster. Leave blank to pick up the latest
+	// stable release, or specify a version of the form "x.y.z". The Google
+	// Container Engine release notes lists the currently supported
+	// versions. If an incorrect version is specified, the server returns an
+	// error listing the currently supported versions.
 	ClusterApiVersion string `json:"clusterApiVersion,omitempty"`
 
 	// ContainerIpv4Cidr: [Output only] The IP addresses of the container
@@ -149,8 +154,8 @@ type Cluster struct {
 	// master. The endpoint can be accessed from the internet at
 	// https://username:password@endpoint/.
 	//
-	// See masterAuth for username and
-	// password information.
+	// See the masterAuth property of
+	// this resource for username and password information.
 	Endpoint string `json:"endpoint,omitempty"`
 
 	// MasterAuth: The HTTP basic authentication information for accessing
@@ -167,8 +172,12 @@ type Cluster struct {
 	// - Must end with a number or a letter.
 	Name string `json:"name,omitempty"`
 
+	// Network: The name of the Google Compute Engine network to which the
+	// cluster is connected.
+	Network string `json:"network,omitempty"`
+
 	// NodeConfig: The machine type and image to use for all nodes in this
-	// cluster. See the child properties for details.
+	// cluster. See the descriptions of the child properties of nodeConfig.
 	NodeConfig *NodeConfig `json:"nodeConfig,omitempty"`
 
 	// NodeRoutingPrefixSize: [Output only] The size of the address space on
@@ -180,6 +189,9 @@ type Cluster struct {
 	// number of instances plus one (to include the master). You must also
 	// have available firewall and routes quota.
 	NumNodes int64 `json:"numNodes,omitempty"`
+
+	// SelfLink: [Output only] Server-defined URL for the resource.
+	SelfLink string `json:"selfLink,omitempty"`
 
 	// ServicesIpv4Cidr: [Output only] The IP addresses of the Kubernetes
 	// services in this cluster, in  CIDR notation (e.g. 1.2.3.4/29).
@@ -242,16 +254,27 @@ type NodeConfig struct {
 	// n1-standard-1.
 	MachineType string `json:"machineType,omitempty"`
 
+	// ServiceAccounts: The optional list of ServiceAccounts, each with
+	// their specified scopes, to be made available on all of the node VMs.
+	// In addition to the service accounts and scopes specified, the
+	// "default" account will always be created with the following scopes to
+	// ensure the correct functioning of the cluster:
+	// -
+	// https://www.googleapis.com/auth/compute,
+	// -
+	// https://www.googleapis.com/auth/devstorage.read_only
+	ServiceAccounts []*ServiceAccount `json:"serviceAccounts,omitempty"`
+
 	// SourceImage: The fully-specified name of a Google Compute Engine
 	// image. For example:
 	// https://www.googleapis.com/compute/v1/projects/debian-cloud/global/ima
 	// ges/backports-debian-7-wheezy-vYYYYMMDD (where YYYMMDD is the version
 	// date).
 	//
-	// If specifying an image, the user is responsible for ensuring
-	// its compatibility with the Debian 7 backports image. We recommend
-	// leaving this field blank to accept the default
-	// backports-debian-7-wheezy value.
+	// If specifying an image, you are responsible for ensuring its
+	// compatibility with the Debian 7 backports image. We recommend leaving
+	// this field blank to accept the default backports-debian-7-wheezy
+	// value.
 	SourceImage string `json:"sourceImage,omitempty"`
 }
 
@@ -267,6 +290,9 @@ type Operation struct {
 	// OperationType: The operation type.
 	OperationType string `json:"operationType,omitempty"`
 
+	// SelfLink: Server-defined URL for the resource.
+	SelfLink string `json:"selfLink,omitempty"`
+
 	// Status: The current status of the operation.
 	Status string `json:"status,omitempty"`
 
@@ -274,9 +300,21 @@ type Operation struct {
 	// operation is associated with.
 	Target string `json:"target,omitempty"`
 
+	// TargetLink: Server-defined URL for the target of the operation.
+	TargetLink string `json:"targetLink,omitempty"`
+
 	// Zone: The name of the Google Compute Engine zone in which the
 	// operation is taking place.
 	Zone string `json:"zone,omitempty"`
+}
+
+type ServiceAccount struct {
+	// Email: Email address of the service account.
+	Email string `json:"email,omitempty"`
+
+	// Scopes: The list of scopes to be made available for this service
+	// account.
+	Scopes []string `json:"scopes,omitempty"`
 }
 
 // method id "container.projects.clusters.list":
@@ -363,7 +401,7 @@ type ProjectsOperationsListCall struct {
 	opt_      map[string]interface{}
 }
 
-// List: List all operations in a project, across all zones.
+// List: Lists all operations in a project, across all zones.
 func (r *ProjectsOperationsService) List(projectId string) *ProjectsOperationsListCall {
 	c := &ProjectsOperationsListCall{s: r.s, opt_: make(map[string]interface{})}
 	c.projectId = projectId
@@ -406,7 +444,7 @@ func (c *ProjectsOperationsListCall) Do() (*ListAggregatedOperationsResponse, er
 	}
 	return ret, nil
 	// {
-	//   "description": "List all operations in a project, across all zones.",
+	//   "description": "Lists all operations in a project, across all zones.",
 	//   "httpMethod": "GET",
 	//   "id": "container.projects.operations.list",
 	//   "parameterOrder": [
@@ -441,8 +479,8 @@ type ProjectsZonesClustersCreateCall struct {
 	opt_                 map[string]interface{}
 }
 
-// Create: Create a cluster, consisting of the specified number and type
-// of Google Compute Engine instances, plus a Kubernetes master
+// Create: Creates a cluster, consisting of the specified number and
+// type of Google Compute Engine instances, plus a Kubernetes master
 // instance.
 //
 // The cluster is created in the project's default
@@ -507,7 +545,7 @@ func (c *ProjectsZonesClustersCreateCall) Do() (*Operation, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Create a cluster, consisting of the specified number and type of Google Compute Engine instances, plus a Kubernetes master instance.\n\nThe cluster is created in the project's default network.\n\nA firewall is added that allows traffic into port 443 on the master, which enables HTTPS. A firewall and a route is added for each node to allow the containers on that node to communicate with all other instances in the cluster.\n\nFinally, a route named k8s-iproute-10-xx-0-0 is created to track that the cluster's 10.xx.0.0/16 CIDR has been assigned.",
+	//   "description": "Creates a cluster, consisting of the specified number and type of Google Compute Engine instances, plus a Kubernetes master instance.\n\nThe cluster is created in the project's default network.\n\nA firewall is added that allows traffic into port 443 on the master, which enables HTTPS. A firewall and a route is added for each node to allow the containers on that node to communicate with all other instances in the cluster.\n\nFinally, a route named k8s-iproute-10-xx-0-0 is created to track that the cluster's 10.xx.0.0/16 CIDR has been assigned.",
 	//   "httpMethod": "POST",
 	//   "id": "container.projects.zones.clusters.create",
 	//   "parameterOrder": [
@@ -552,7 +590,7 @@ type ProjectsZonesClustersDeleteCall struct {
 	opt_      map[string]interface{}
 }
 
-// Delete: Delete the cluster, including the Kubernetes master and all
+// Delete: Deletes the cluster, including the Kubernetes master and all
 // worker nodes.
 //
 // Firewalls and routes that were configured at cluster
@@ -603,7 +641,7 @@ func (c *ProjectsZonesClustersDeleteCall) Do() (*Operation, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Delete the cluster, including the Kubernetes master and all worker nodes.\n\nFirewalls and routes that were configured at cluster creation are also deleted.",
+	//   "description": "Deletes the cluster, including the Kubernetes master and all worker nodes.\n\nFirewalls and routes that were configured at cluster creation are also deleted.",
 	//   "httpMethod": "DELETE",
 	//   "id": "container.projects.zones.clusters.delete",
 	//   "parameterOrder": [
@@ -652,7 +690,7 @@ type ProjectsZonesClustersGetCall struct {
 	opt_      map[string]interface{}
 }
 
-// Get: Get a specific cluster.
+// Get: Gets a specific cluster.
 func (r *ProjectsZonesClustersService) Get(projectId string, zoneId string, clusterId string) *ProjectsZonesClustersGetCall {
 	c := &ProjectsZonesClustersGetCall{s: r.s, opt_: make(map[string]interface{})}
 	c.projectId = projectId
@@ -699,7 +737,7 @@ func (c *ProjectsZonesClustersGetCall) Do() (*Cluster, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Get a specific cluster.",
+	//   "description": "Gets a specific cluster.",
 	//   "httpMethod": "GET",
 	//   "id": "container.projects.zones.clusters.get",
 	//   "parameterOrder": [
@@ -834,7 +872,7 @@ type ProjectsZonesOperationsGetCall struct {
 	opt_        map[string]interface{}
 }
 
-// Get: Get the specified operation.
+// Get: Gets the specified operation.
 func (r *ProjectsZonesOperationsService) Get(projectId string, zoneId string, operationId string) *ProjectsZonesOperationsGetCall {
 	c := &ProjectsZonesOperationsGetCall{s: r.s, opt_: make(map[string]interface{})}
 	c.projectId = projectId
@@ -881,7 +919,7 @@ func (c *ProjectsZonesOperationsGetCall) Do() (*Operation, error) {
 	}
 	return ret, nil
 	// {
-	//   "description": "Get the specified operation.",
+	//   "description": "Gets the specified operation.",
 	//   "httpMethod": "GET",
 	//   "id": "container.projects.zones.operations.get",
 	//   "parameterOrder": [
@@ -929,7 +967,7 @@ type ProjectsZonesOperationsListCall struct {
 	opt_      map[string]interface{}
 }
 
-// List: List all operations in a project in a specific zone.
+// List: Lists all operations in a project in a specific zone.
 func (r *ProjectsZonesOperationsService) List(projectId string, zoneId string) *ProjectsZonesOperationsListCall {
 	c := &ProjectsZonesOperationsListCall{s: r.s, opt_: make(map[string]interface{})}
 	c.projectId = projectId
@@ -974,7 +1012,7 @@ func (c *ProjectsZonesOperationsListCall) Do() (*ListOperationsResponse, error) 
 	}
 	return ret, nil
 	// {
-	//   "description": "List all operations in a project in a specific zone.",
+	//   "description": "Lists all operations in a project in a specific zone.",
 	//   "httpMethod": "GET",
 	//   "id": "container.projects.zones.operations.list",
 	//   "parameterOrder": [

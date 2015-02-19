@@ -1,9 +1,9 @@
 {
  "kind": "discovery#restDescription",
  "discoveryVersion": "v1",
- "id": "developerprojects:v1",
+ "id": "developerprojects:v2beta1",
  "name": "developerprojects",
- "version": "v1",
+ "version": "v2beta1",
  "revision": "20150210",
  "title": "Developer Projects API",
  "description": "Developer Projects API.",
@@ -14,10 +14,10 @@
   "x32": "http://www.google.com/images/icons/product/search-32.gif"
  },
  "protocol": "rest",
- "baseUrl": "https://www.googleapis.com/developerprojects/v1/",
- "basePath": "/developerprojects/v1/",
+ "baseUrl": "https://www.googleapis.com/developerprojects/v2beta1/",
+ "basePath": "/developerprojects/v2beta1/",
  "rootUrl": "https://www.googleapis.com/",
- "servicePath": "developerprojects/v1/",
+ "servicePath": "developerprojects/v2beta1/",
  "batchPath": "batch",
  "parameters": {
   "alt": {
@@ -74,119 +74,6 @@
   }
  },
  "schemas": {
-  "Binding": {
-   "id": "Binding",
-   "type": "object",
-   "description": "Represents the binding of various entities such as users and groups to a specified role, which in turn defines the permissions that these entities have on the resource.",
-   "externalTypeName": "google.iam.v1.Binding",
-   "properties": {
-    "members": {
-     "type": "array",
-     "description": "Format of member entries: 1) * Matches any requesting principal (users, service accounts or anonymous).\n\n2) user:$emailid A google user account using a fully qualified email address. For example alice@gmail.com, joe@bestbuy.com\n\n3) serviceAccount:/projects/$project/serviceAccounts/$name An IAM service account with a fully qualified REST name\n\n4) serviceAccount:$name An IAM service account with relative name.\n\n5) group:$emailid A google group with a fully qualified email address. For example auth-ti-cloud@google.com\n\n6) authoritySelector:/projects/$project/authoritySelectors/$name An IAM authority selector with a fully qualified REST name.\n\n7) authoritySelector:$name An IAM authority selector with a relative name.\n\n8) mdb:$name Ganpati group name. For example bigtable-prod, zanzibar-dev\n\nNote: It is an error to use relative IAM names for token policies. They can only be used for a resource (policy) which has a project to infer from. -------------------------------------------------------",
-     "items": {
-      "type": "string"
-     }
-    },
-    "role": {
-     "type": "string",
-     "description": "Required"
-    }
-   }
-  },
-  "Condition": {
-   "id": "Condition",
-   "type": "object",
-   "externalTypeName": "google.iam.v1.Condition",
-   "properties": {
-    "iam": {
-     "type": "string",
-     "description": "Trusted attributes supplied by the IAM system.",
-     "enum": [
-      "authoritySelector",
-      "noAttr",
-      "principal",
-      "token"
-     ],
-     "enumDescriptions": [
-      "",
-      "",
-      "",
-      ""
-     ]
-    },
-    "op": {
-     "type": "string",
-     "enum": [
-      "discharged",
-      "equals",
-      "in",
-      "noOp",
-      "notEquals",
-      "notIn"
-     ],
-     "enumDescriptions": [
-      "",
-      "",
-      "",
-      "",
-      "",
-      ""
-     ]
-    },
-    "svc": {
-     "type": "string",
-     "description": "Trusted attributes discharged by the service."
-    },
-    "sys": {
-     "type": "string",
-     "description": "Trusted attributes supplied by any service that owns resources and uses the IAM system for access control.",
-     "enum": [
-      "ip",
-      "name",
-      "noAttr",
-      "region",
-      "type"
-     ],
-     "enumDescriptions": [
-      "",
-      "",
-      "",
-      "",
-      ""
-     ]
-    },
-    "value": {
-     "type": "string",
-     "description": "The object of the condition. Exactly one of these must be set."
-    },
-    "values": {
-     "type": "array",
-     "items": {
-      "type": "string"
-     }
-    }
-   }
-  },
-  "CreateProjectRequest1": {
-   "id": "CreateProjectRequest1",
-   "type": "object",
-   "description": "The request sent to the CreateProject method.",
-   "externalTypeName": "developer.projects.v1.CreateProjectRequest",
-   "properties": {
-    "appengineStorageLocation": {
-     "type": "string",
-     "description": "The storage location for the AppEngine app."
-    },
-    "createAppengineProject": {
-     "type": "boolean",
-     "description": "If true, an AppEngine project will be created."
-    },
-    "project": {
-     "$ref": "Project",
-     "description": "The project the user wishes to create. The user must supply the 'project_id' field, and may optionally set the 'title' field. All other fields must be unset.\n\nIf the requested id is unavailable, the request will fail."
-    }
-   }
-  },
   "ListProjectsResponse": {
    "id": "ListProjectsResponse",
    "type": "object",
@@ -206,60 +93,6 @@
     }
    }
   },
-  "LogConfig": {
-   "id": "LogConfig",
-   "type": "object",
-   "description": "Specifies what kind of log the caller must write",
-   "externalTypeName": "google.iam.v1.LogConfig",
-   "properties": {
-    "counter": {
-     "$ref": "LogConfigCounterOptions"
-    }
-   }
-  },
-  "LogConfigCounterOptions": {
-   "id": "LogConfigCounterOptions",
-   "type": "object",
-   "externalTypeName": "google.iam.v1.LogConfig.CounterOptions",
-   "properties": {
-    "field": {
-     "type": "string"
-    },
-    "metric": {
-     "type": "string"
-    }
-   }
-  },
-  "Policy": {
-   "id": "Policy",
-   "type": "object",
-   "externalTypeName": "google.iam.v1.Policy",
-   "properties": {
-    "bindings": {
-     "type": "array",
-     "description": "It is an error to specify multiple bindings for the same role. Bindings with no members may be silently dropped by the underlying policy storage system.",
-     "items": {
-      "$ref": "Binding"
-     }
-    },
-    "etag": {
-     "type": "string",
-     "description": "Can be used to perform a read-modify-write.",
-     "format": "byte"
-    },
-    "rules": {
-     "type": "array",
-     "items": {
-      "$ref": "Rule"
-     }
-    },
-    "version": {
-     "type": "integer",
-     "description": "The policy language version. The version of the policy itself is represented by the etag.",
-     "format": "int32"
-    }
-   }
-  },
   "Project": {
    "id": "Project",
    "type": "object",
@@ -274,23 +107,6 @@
      "type": "string",
      "description": "The time at which the project was created in milliseconds since the epoch.\n\nThis is a read-only field.",
      "format": "int64"
-    },
-    "deprecated5": {
-     "type": "string",
-     "enum": [
-      "deprecated0",
-      "deprecated1",
-      "deprecated2",
-      "deprecated3",
-      "deprecated4"
-     ],
-     "enumDescriptions": [
-      "",
-      "",
-      "",
-      "",
-      ""
-     ]
     },
     "labels": {
      "type": "array",
@@ -344,113 +160,9 @@
      "type": "string"
     }
    }
-  },
-  "Rule": {
-   "id": "Rule",
-   "type": "object",
-   "externalTypeName": "google.iam.v1.Rule",
-   "properties": {
-    "action": {
-     "type": "string",
-     "description": "Required",
-     "enum": [
-      "allow",
-      "allowWithLog",
-      "deny",
-      "denyWithLog",
-      "log",
-      "noAction"
-     ],
-     "enumDescriptions": [
-      "",
-      "",
-      "",
-      "",
-      "",
-      ""
-     ]
-    },
-    "conditions": {
-     "type": "array",
-     "description": "Additional restrictions that must be met",
-     "items": {
-      "$ref": "Condition"
-     }
-    },
-    "description": {
-     "type": "string",
-     "description": "Human-readable description of the rule."
-    },
-    "in": {
-     "type": "array",
-     "description": "The rule matches if the PRINCIPAL/AUTHORITY_SELECTOR is in this set of entries.",
-     "items": {
-      "type": "string"
-     }
-    },
-    "logConfig": {
-     "type": "array",
-     "description": "The config returned to callers of tech.iam.IAM.CheckPolicy for any entries that match the LOG action.",
-     "items": {
-      "$ref": "LogConfig"
-     }
-    },
-    "notIn": {
-     "type": "array",
-     "description": "The rule matches if the PRINCIPAL/AUTHORITY_SELECTOR is not in this set of entries.",
-     "items": {
-      "type": "string"
-     }
-    },
-    "permissions": {
-     "type": "array",
-     "description": "A permission is a string of form '$type.$action' (e.g., 'storage.read').",
-     "items": {
-      "type": "string"
-     }
-    }
-   }
-  },
-  "SetPolicyRequest": {
-   "id": "SetPolicyRequest",
-   "type": "object",
-   "externalTypeName": "google.iam.v1.SetPolicyRequest",
-   "properties": {
-    "changeDescription": {
-     "type": "string",
-     "description": "Human readable summary of change, reason for change, who requested the change etc. for auditing purposes. TODO: Do we need more structure here for higher level tools?"
-    },
-    "policy": {
-     "$ref": "Policy",
-     "description": "REQUIRED: The complete policy to be applied to the 'resource'. The size of the policy is limited to a few 10s of KB. An empty policy is in general a valid policy but certain services (like Projects) might reject them."
-    },
-    "wait": {
-     "type": "boolean",
-     "description": "If true the SetPolicy call returns only after it is guaranteed that a subsequent CheckPolicy call will observe the new policy. NOTE: We may support this guarantee only for policy changes that broaden access."
-    }
-   }
   }
  },
  "resources": {
-  "developerProjects": {
-   "methods": {
-    "internalcreateproject": {
-     "id": "developerprojects.developerProjects.internalcreateproject",
-     "path": "developerProjects/internalcreateproject",
-     "httpMethod": "POST",
-     "description": "Creates a project resource. This should produce the same project as CreateProject.",
-     "request": {
-      "$ref": "CreateProjectRequest1"
-     },
-     "response": {
-      "$ref": "Project"
-     },
-     "scopes": [
-      "https://www.googleapis.com/auth/cloud-platform"
-     ]
-    }
-   }
-  },
   "projects": {
    "methods": {
     "create": {
@@ -621,59 +333,6 @@
      },
      "response": {
       "$ref": "Project"
-     },
-     "scopes": [
-      "https://www.googleapis.com/auth/cloud-platform"
-     ]
-    }
-   }
-  },
-  "v1": {
-   "methods": {
-    "getIamPolicy": {
-     "id": "developerprojects.v1.getIamPolicy",
-     "path": "v1/{+resource}:getIamPolicy",
-     "httpMethod": "POST",
-     "description": "Returns the IAM access control policy for specified project. Resource should be in format: \"/projectid\" Uses POST instead of GET because Protiary v2 can't support repeated messages in GET requests.",
-     "parameters": {
-      "resource": {
-       "type": "string",
-       "description": "REQUIRED: The resource for which policy is being requested. Usually some path like projects/{$project}/zones/{$zone}/disks/{$disk}.",
-       "required": true,
-       "location": "path"
-      }
-     },
-     "parameterOrder": [
-      "resource"
-     ],
-     "response": {
-      "$ref": "Policy"
-     },
-     "scopes": [
-      "https://www.googleapis.com/auth/cloud-platform"
-     ]
-    },
-    "setIamPolicy": {
-     "id": "developerprojects.v1.setIamPolicy",
-     "path": "v1/{+resource}:setIamPolicy",
-     "httpMethod": "POST",
-     "description": "Sets the IAM access control policy for the specified project. Resource should be in format: \"/projectid\"",
-     "parameters": {
-      "resource": {
-       "type": "string",
-       "description": "REQUIRED: The resource for which policy is being specified. Usually some path like projects/{$project}/zones/{$zone}/disks/{$disk}.",
-       "required": true,
-       "location": "path"
-      }
-     },
-     "parameterOrder": [
-      "resource"
-     ],
-     "request": {
-      "$ref": "SetPolicyRequest"
-     },
-     "response": {
-      "$ref": "Policy"
      },
      "scopes": [
       "https://www.googleapis.com/auth/cloud-platform"
