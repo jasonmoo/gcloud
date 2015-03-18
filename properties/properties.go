@@ -230,17 +230,12 @@ func GetInstallDirPropFile() string {
 }
 
 func (properties *Properties) LoadPropertiesFiles() error {
-	for i := 0; i <= 2; i++ {
-		var path string
-		switch i {
-		case 0:
-			path = GetInstallDirPropFile()
-		case 1:
-			path = GetHomeDirPropFile()
-		case 2:
-			path = GetWorkspacePropFile()
-		}
-		if len(path) > 0 {
+	for _, f := range [3]func() string{
+		GetInstallDirPropFile,
+		GetHomeDirPropFile,
+		GetWorkspacePropFile,
+	} {
+		if path := f(); len(path) > 0 {
 			file, err := os.Open(path)
 			if err != nil {
 				return err
